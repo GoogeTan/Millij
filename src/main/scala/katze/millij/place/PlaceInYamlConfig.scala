@@ -1,15 +1,15 @@
-package katze.millij
+package katze.millij.place
 
 import cats.Applicative
 import cats.syntax.all.*
-import katze.millij.scalatypes.extractTemplateDefinition
+import com.intellij.psi.{PsiClass, PsiElement}
+import katze.millij.scalatypes.{extractTemplateDefinition, findMemberType, unwrapMillTask, unwrapSeq, yamlDefinableMembersOf}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue, ScValueOrVariable, ScVariable}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScMember, ScTemplateDefinition}
-import org.jetbrains.plugins.scala.lang.psi.types.{BaseTypes, ScType, ScTypeExt}
 import org.jetbrains.plugins.scala.lang.psi.types.api.ParameterizedType
-import org.jetbrains.yaml.psi.{YAMLDocument, YAMLKeyValue, YAMLMapping, YAMLPsiElement, YAMLScalar, YAMLSequence, YAMLSequenceItem}
-import com.intellij.psi.{PsiClass, PsiElement}
+import org.jetbrains.plugins.scala.lang.psi.types.{BaseTypes, ScType, ScTypeExt}
+import org.jetbrains.yaml.psi.*
 
 import scala.annotation.tailrec
 import scala.jdk.CollectionConverters.*
@@ -133,9 +133,9 @@ def yamlDefinableMembersOfScope : PlaceInYamlConfig[ScType] => List[ScTypedDefin
   case PlaceInYamlConfig.Module(extendList, _) =>
     extendList
       .flatMap(extractTemplateDefinition)
-      .flatMap(getParameterlessMembers)
+      .flatMap(yamlDefinableMembersOf)
   case PlaceInYamlConfig.Member(_, _, expectedType, _) =>
     extractTemplateDefinition(expectedType)
       .toList
-      .flatMap(getParameterlessMembers)
+      .flatMap(yamlDefinableMembersOf)
 end yamlDefinableMembersOfScope
