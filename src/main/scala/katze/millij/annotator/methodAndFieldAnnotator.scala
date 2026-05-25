@@ -11,8 +11,8 @@ import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping}
 
 def unexistingMembersAnnotator(
   checkIfItIsACorrectMember : (YAMLMapping, YAMLKeyValue) => Option[String]
-) : CoolAnnotator[YAMLKey[PsiElement], (YAMLKeyValue, YAMLMapping)] =
-  case (element, (keyValue, mapping), annotationHolder) =>
+) : CoolAnnotator[(YAMLKey[PsiElement], YAMLKeyValue, YAMLMapping)] =
+  case ((element, keyValue, mapping), annotationHolder) =>
     if !isObjectDeclarationText(keyValue.getKeyText) && !isExtendsBlock(keyValue.getKeyText) then
       checkIfItIsACorrectMember(mapping, keyValue).foreach(
         error =>
@@ -32,11 +32,11 @@ def scopeNameForUnexistingMembersAnnotator : PlaceInYamlConfig[ScType] => String
   case PlaceInYamlConfig.Module(extendList, definedMembers) =>
     s"module which extends ${extendList.mkString(", ")}"
   case PlaceInYamlConfig.Member(parentTypes, name, expectedType, definedMembers) =>
-    s"object of type <a href=${expectedType}>${expectedType}</a>"
+    s"object of type <a href=$expectedType>$expectedType</a>"
 end scopeNameForUnexistingMembersAnnotator
 
-def methodAndFieldAnnotator : CoolAnnotator[YAMLKeyValueWithNotKey["extends"], YAMLMapping] =
-  case (kv, mapping, annotationHolder) =>
+def methodAndFieldAnnotator : CoolAnnotator[(YAMLKeyValueWithNotKey["extends"], YAMLMapping)] =
+  case ((kv, mapping), annotationHolder) =>
     richScopeOf(kv).foreach:
       case PlaceInYamlConfig.Module(extendList, _) =>
         if isObjectDeclarationText(kv.getKeyText) then

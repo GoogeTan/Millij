@@ -10,13 +10,15 @@ import org.jetbrains.yaml.psi.{YAMLScalar, YAMLSequence, YAMLSequenceItem}
 def extendsListBlockAnnotator(
   isValidExtendsBlockMember : YAMLScalar => Boolean,
 ): CoolAnnotator[
-  YAMLScalar,
-  Either[
-    (YAMLSequenceItem, YAMLSequence, YAMLKeyValueWithKey["extends"]),
-    YAMLKeyValueWithKey["extends"]
-  ]
+  (
+    YAMLScalar,
+    Either[
+      (YAMLSequenceItem, YAMLSequence, YAMLKeyValueWithKey["extends"]),
+      YAMLKeyValueWithKey["extends"]
+    ]
+  )
 ] =
-  case (element, _, annotationHolder) =>
+  case ((element, _), annotationHolder) =>
     if !isValidExtendsBlockMember(element) then
       annotationHolder
         .newAnnotation(HighlightSeverity.ERROR, s"Couldn't find type ${element.getTextValue}")

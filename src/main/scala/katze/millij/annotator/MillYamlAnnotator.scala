@@ -5,20 +5,40 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.text.HtmlChunk
 import com.intellij.psi.PsiElement
 import katze.millij.annotator.{Annotators, CoolAnnotatorAdapter, methodAndFieldAnnotator, mvnDepsAnnotator}
-import katze.millij.cool.{PsiElementMatcher, PsiParent}
-import katze.millij.place.{PlaceInYamlConfig, yamlDefinableMembersOfScope, richScopeOf}
+import katze.millij.cool.{CoolPattern, PsiElementMatcher, PsiParent}
+import katze.millij.place.{PlaceInYamlConfig, richScopeOf, yamlDefinableMembersOfScope}
+import katze.millij.psi.*
 import org.jetbrains.plugins.scala.lang.psi.types.{ScType, ScTypeExt, TypePresentationContext}
-import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping, YAMLScalar}
+import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping, YAMLScalar, YAMLSequence, YAMLSequenceItem}
 
 final class MillYamlAnnotator extends Annotators(
   List(
-    CoolAnnotatorAdapter(methodAndFieldAnnotator),
     CoolAnnotatorAdapter(
-      unexistingMembersAnnotator(unexistingMembersError)
+      methodAndFieldAnnotator,
+      CoolPattern.elementAndParent()
     ),
-    CoolAnnotatorAdapter(mvnDepsAnnotator),
-    CoolAnnotatorAdapter(extendsListBlockAnnotator(isValidExtendsBlockMember)),
-    CoolAnnotatorAdapter(objectInInappropriatePlace),
+    CoolAnnotatorAdapter(
+      unexistingMembersAnnotator(unexistingMembersError),
+      CoolPattern.elementAndParents[YAMLKey[PsiElement], (YAMLKeyValue, YAMLMapping)]()
+    ),
+    CoolAnnotatorAdapter(
+      mvnDepsAnnotator,
+      CoolPattern.element
+    ),
+    CoolAnnotatorAdapter(
+      extendsListBlockAnnotator(isValidExtendsBlockMember),
+      CoolPattern.elementAndParent[
+        YAMLScalar,
+        Either[
+          (YAMLSequenceItem, YAMLSequence, YAMLKeyValueWithKey["extends"]),
+          YAMLKeyValueWithKey["extends"]
+        ]
+      ]()
+    ),
+    CoolAnnotatorAdapter(
+      objectInInappropriatePlace,
+      CoolPattern.elementAndParent()
+    ),
   )
 )
 

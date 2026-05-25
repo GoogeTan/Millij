@@ -7,13 +7,13 @@ import org.jetbrains.yaml.psi.{YAMLDocument, YAMLKeyValue, YAMLMapping}
 
 import scala.annotation.tailrec
 
-def objectInInappropriatePlace : CoolAnnotator[YAMLKeyValue, YAMLMapping] =
-  case (kv, mapping, annotationHolder) =>
+def objectInInappropriatePlace : CoolAnnotator[(YAMLKeyValue, YAMLMapping)] =
+  case ((kv, _), annotationHolder) =>
     @tailrec
     def isPathCorrect(kv : YAMLKeyValue) : Boolean = kv match
-      case PsiChild(self : YAMLKeyValue, parent : YAMLMapping, further : YAMLDocument, _*) =>
+      case PsiChild(_ : YAMLKeyValue, _ : YAMLMapping, _ : YAMLDocument, _*) =>
         true
-      case PsiChild(self : YAMLKeyValue, parent : YAMLMapping, further : YAMLKeyValue, _*) if isObjectDeclarationText(further.getKeyText) =>
+      case PsiChild(_ : YAMLKeyValue, _ : YAMLMapping, further : YAMLKeyValue, _*) if isObjectDeclarationText(further.getKeyText) =>
         isPathCorrect(further)
       case _ =>
         false

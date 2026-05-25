@@ -13,8 +13,8 @@ def isMvnDependency(tie : ScType) : Boolean =
     .getOrElse(false)
 end isMvnDependency
 
-def mvnDepsAnnotator : CoolAnnotator[YAMLScalar, EmptyTuple] =
-  case (scalar, _, annotationHolder) =>
+def mvnDepsAnnotator : CoolAnnotator[YAMLScalar] =
+  case (scalar, annotationHolder) =>
     // Нас тут не интересуют ошибки вида не нашлось поле extends и так далее. Поэтосу можно забить на ошибки
     richScopeOf(scalar).foreach:
       case PlaceInYamlConfig.Module(_, _) =>
