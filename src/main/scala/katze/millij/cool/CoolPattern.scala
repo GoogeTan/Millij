@@ -9,6 +9,12 @@ import katze.millij.psi.PsiChild
 import scala.Tuple.:*
 import scala.util.NotGiven
 
+/**
+ * A way to express ElementPatterns that produce values. Other Cool-prefixed classes take them as params instead of ElementPatterns
+ * Usually it is a typecheck of PsiElement and/or it's parents.
+ * @param pattern tests if value can be built
+ * @param extract builds value from PsiElement
+ */
 final case class CoolPattern[Data](
   pattern : ElementPattern[? <: PsiElement],
   extract : PsiElement => Option[Data]
