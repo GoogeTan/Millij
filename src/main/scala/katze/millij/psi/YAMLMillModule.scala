@@ -9,6 +9,9 @@ import katze.millij.cool.PsiParent
 import katze.millij.place.isObjectDeclarationText
 import org.jetbrains.yaml.psi.{YAMLDocument, YAMLKeyValue}
 
+/**
+ * A mill module declaration. It is either YAMLDocument or YAMLKeyValue with name "object ...".
+ */
 opaque type YAMLMillModule <: YAMLDocument | YAMLKeyValue = YAMLDocument | YAMLKeyValue
 
 object YAMLMillModule:

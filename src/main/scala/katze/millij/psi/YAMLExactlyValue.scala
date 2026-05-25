@@ -8,10 +8,14 @@ import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLValue}
 
 import scala.reflect.{ClassTag, TypeTest, classTag}
 
-opaque type YAMLExactlyValue[T <: YAMLValue] <: T = T
+/**
+ * A value psi element of YAMLKeyValue.
+ * In other words it is true that element.getParent is YAMLKeyValue and element.getParent.getValue is this
+ */
+opaque type YAMLExactlyValue[T <: PsiElement] <: T = T
 
 object YAMLExactlyValue:
-  given valueNodeMatcher[T <: YAMLValue](
+  given valueNodeMatcher[T <: PsiElement](
     using
     ct: ClassTag[T],
     tt: TypeTest[PsiElement, T]
@@ -40,8 +44,7 @@ object YAMLExactlyValue:
     end extract
   end valueNodeMatcher
 
-  given valueNodePsiParent[T <: YAMLValue : ClassTag](using tt: TypeTest[PsiElement, T]): PsiParent[YAMLExactlyValue[T]] with
-
+  given valueNodePsiParent[T <: PsiElement : ClassTag](using tt: TypeTest[PsiElement, T]): PsiParent[YAMLExactlyValue[T]] with
     override def appendTo[V <: PsiElement](
       value: PsiElementPattern.Capture[V],
       level: Int

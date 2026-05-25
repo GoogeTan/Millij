@@ -8,6 +8,9 @@ import katze.millij.cool.{PsiElementMatcher, PsiParent}
 import katze.millij.psi.YAMLKeyValueWithNotKey as keyValuePairWithMatcher
 import org.jetbrains.yaml.psi.YAMLKeyValue
 
+/**
+ * YAMLKeyValue that getKeyText != expectedKey
+ */
 opaque type YAMLKeyValueWithNotKey[Key <: String] <: YAMLKeyValue = YAMLKeyValue
 
 object YAMLKeyValueWithNotKey:

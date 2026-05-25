@@ -2,6 +2,9 @@ package katze.millij.psi
 
 import org.jetbrains.yaml.psi.*
 
+/**
+ * A type of YAMLPsiElement.getParent in case it happened not to be a file or whole document.
+ */
 type YAMLPossibleNonFileParent = YAMLMapping | YAMLSequence | YAMLSequenceItem | YAMLKeyValue | YAMLScalar | YAMLAnchor | YAMLAlias
 
 object YAMLPossibleNonFileParent:

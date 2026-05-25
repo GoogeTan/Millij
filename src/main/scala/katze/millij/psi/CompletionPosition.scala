@@ -5,6 +5,9 @@ import com.intellij.patterns.StandardPatterns.or
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.{PsiElement, PsiErrorElement, PsiWhiteSpace}
 
+/**
+ * A type of psi element that autocomplete is expected to be called on
+ */
 type CompletionPosition = LeafPsiElement | PsiWhiteSpace | PsiErrorElement
 
 object CompletionPosition:

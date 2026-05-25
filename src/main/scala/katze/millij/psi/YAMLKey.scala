@@ -8,6 +8,11 @@ import org.jetbrains.yaml.psi.YAMLKeyValue
 
 import scala.reflect.{ClassTag, TypeTest, classTag}
 
+/**
+ * A key psi element of YAMLKeyValue.
+ * In other words it is true that element.getParent is YAMLKeyValue and element.getParent.getKey is this
+ * @tparam T
+ */
 opaque type YAMLKey[T <: PsiElement] <: T = T
 
 object YAMLKey:

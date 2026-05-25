@@ -6,6 +6,9 @@ import com.intellij.util.ProcessingContext
 import katze.millij.cool.{PsiElementMatcher, PsiParent}
 import org.jetbrains.yaml.psi.YAMLKeyValue
 
+/**
+ * YAMLKeyValue that getKeyText == expectedKey
+ */
 opaque type YAMLKeyValueWithKey[Key <: String] <: YAMLKeyValue = YAMLKeyValue
 
 object YAMLKeyValueWithKey:
