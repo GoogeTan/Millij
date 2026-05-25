@@ -1,15 +1,61 @@
 <idea-plugin>
-    <id>katze.mill-template-plugin</id>
-    <name>Mill Project Template</name>
+    <id>katze.millij</id>
+    <name>Millij</name>
     <vendor>Katze</vendor>
+
+    <description>
+        The plugin adds support for the Mill build tool. It enables multiple features such as
+        type hints, go to definition, code completions for YAML configs, project wizards,
+        available tasks tool window, and others.
+    </description>
+
+    <resource-bundle>messages.MillBundle</resource-bundle>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.plugins.yaml</depends>
     <depends>org.intellij.scala</depends>
     <depends>com.intellij.modules.java</depends>
+    <depends>org.jetbrains.idea.maven</depends>
+    <depends optional="true" config-file="mill-kotlin-features.xml">org.jetbrains.kotlin</depends>
+
+    <extensions defaultExtensionNs="org.jetbrains.kotlin">
+        <supportsKotlinPluginMode supportsK2="true" />
+    </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <completion.contributor language="yaml" implementationClass="katze.intellijmill.YamlCompletionContributor"/>
-        <psi.referenceContributor language="yaml" implementation="katze.intellijmill.YamlReferenceContributor"/>
+        <configurationType implementation="katze.millij.configuration.MillRunConfigurationType"/>
+        <postStartupActivity implementation="katze.millij.MillProjectStartupActivity"/>
+        <completion.contributor language="yaml" implementationClass="katze.millij.completions.YamlCompletionContributor"/>
+        <completion.contributor language="Scala 3" order="first" implementationClass="katze.millij.completions.ScalaCompletionProvider"/>
+        <completion.confidence
+                order="first"
+                language="Scala 3"
+                implementationClass="katze.millij.completions.MillStringCompletionConfidence"/>
+        <psi.referenceContributor language="yaml" implementation="katze.millij.reference.YamlReferenceContributor"/>
+        
+        <annotator
+                language="yaml"
+                implementationClass="katze.millij.annotator.MillYamlAnnotator" />
+
+        <codeInsight.declarativeInlayProvider
+                implementationClass="katze.millij.inlay.MillYamlInlayHintsProvider"
+                language="yaml"
+                group="TYPES_GROUP"
+                isEnabledByDefault="true"
+                nameKey="katze.mill.yaml.inlay.provider"
+                providerId="katze.mill.yaml.inlay.provider"
+        />
+
+        <toolWindow
+                factoryClass="katze.millij.toolwindow.MillModulesToolWindowFactory"
+                id="MillToolWindow"
+                anchor="right"
+                icon="icons/millFile.svg"
+        />
+
+        <newProjectWizard.scala.buildSystem
+            implementation="katze.millij.wizard.MillScalaNewProjectWizard" />
+        <newProjectWizard.java.buildSystem
+                implementation="katze.millij.wizard.MillJavaNewProjectWizard" />
     </extensions>
 </idea-plugin>

@@ -3,7 +3,7 @@ import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
-    id("org.jetbrains.intellij.platform") version "2.14.0"
+    id("org.jetbrains.intellij.platform") version "2.16.0"
     id("org.jetbrains.changelog") version "2.5.0"
     id("scala")
 }
@@ -16,10 +16,10 @@ repositories {
     }
 }
 
-// Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/version_catalogs.html
 dependencies {
     testImplementation("junit:junit:4.13.2")
     compileOnly("org.scala-lang:scala3-library_3:3.8.3")
+    testImplementation("org.scala-lang:scala3-library_3:3.8.3")
     implementation("org.typelevel:cats-core_3:2.13.0") {
         exclude(group = "org.scala-lang")
     }
@@ -28,6 +28,8 @@ dependencies {
         intellijIdea("2026.1")
         plugin("org.intellij.scala", "2026.1.16")
         bundledPlugin("com.intellij.java")
+        bundledPlugin("org.jetbrains.kotlin")
+        bundledPlugin("org.jetbrains.idea.maven")
         testFramework(TestFrameworkType.Platform)
         bundledPlugin("org.jetbrains.plugins.yaml")
     }
@@ -37,7 +39,7 @@ dependencies {
 intellijPlatform {
     pluginConfiguration {
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
-        description = providers.fileContents(layout.projectDirectory.file("README.md")).asText.map {
+        /*description = providers.fileContents(layout.projectDirectory.file("README.md")).asText.map {
             val start = "<!-- Plugin description -->"
             val end = "<!-- Plugin description end -->"
 
@@ -47,7 +49,7 @@ intellijPlatform {
                 }
                 subList(indexOf(start) + 1, indexOf(end)).joinToString("\n").let(::markdownToHTML)
             }
-        }
+        }*/
 
         val changelog = project.changelog // local variable for configuration cache compatibility
         // Get the latest available change notes from the changelog file
