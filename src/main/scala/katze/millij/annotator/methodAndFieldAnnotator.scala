@@ -4,6 +4,7 @@ import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.psi.PsiElement
 import katze.millij.*
+import katze.millij.place.*
 import katze.millij.psi.*
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping}

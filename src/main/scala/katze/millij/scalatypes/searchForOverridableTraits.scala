@@ -13,7 +13,7 @@ import scala.jdk.CollectionConverters.*
  * @return
  */
 def searchForOverridableTraits(project: Project): Option[List[PsiClass]] =
-  getMillConfigFilesSubproject(project).flatMap(millModule =>
+  millConfigModule(project).flatMap(millModule =>
     val buildScope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(millModule)
     val facade = ScalaPsiManager.instance(project)
 

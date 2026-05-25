@@ -4,6 +4,7 @@ import com.intellij.codeInsight.completion.*
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
 import katze.millij.*
+import katze.millij.place.*
 import katze.millij.completions.cool.CoolCompletionProvider
 import katze.millij.cool.CoolPattern
 import katze.millij.data.MavenDependencyShared
@@ -27,7 +28,7 @@ def cleanElementTextFromDummyIdentifier(text: String): String =
     .replace(CompletionUtilCore.DUMMY_IDENTIFIER_TRIMMED, "")
 end cleanElementTextFromDummyIdentifier
 
-def suggestMavenDependency(element: CompletionPosition, dependencyText: String, resultSet: CompletionResultSet): Unit =
+def suggestMavenDependency(element: YAMLPsiElement, dependencyText: String, resultSet: CompletionResultSet): Unit =
   richScopeOf(element).foreach:
     case PlaceInYamlConfig.Member(_, _, expectedType, _) if expectedType.canonicalText.endsWith("Dep") =>
       MavenDependencyShared.searchAndSuggestDependencies(resultSet, "3.0.0", element.getProject, "com.google.code.gson:gs")

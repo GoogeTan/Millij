@@ -13,7 +13,7 @@ class MillRunConfiguration(project: Project, factory: ConfigurationFactory, name
 
   var taskName: String = ""
 
-  override def getConfigurationEditor: SettingsEditor[_ <: RunConfiguration] = new MillRunConfigurationEditor()
+  override def getConfigurationEditor: SettingsEditor[? <: RunConfiguration] = new MillRunConfigurationEditor()
 
   override def getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState =
     new CommandLineState(environment):

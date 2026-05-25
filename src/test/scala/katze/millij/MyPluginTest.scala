@@ -7,7 +7,7 @@ import com.intellij.testFramework.TestDataPath
 import com.intellij.testFramework.UsefulTestCase.assertInstanceOf
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import com.intellij.util.PsiErrorElementUtil
-import katze.millij.scopeOf
+import katze.millij.place.placeOf
 import katze.millij.psi.CompletionPosition
 import org.jetbrains.yaml.psi.{YAMLFile, YAMLMapping, YAMLScalar, YAMLSequence}
 import org.junit.Assert.*

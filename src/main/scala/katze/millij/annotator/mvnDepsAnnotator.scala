@@ -2,7 +2,7 @@ package katze.millij.annotator
 
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.psi.util.InheritanceUtil
-import katze.millij.{PlaceInYamlConfig, richScopeOf}
+import katze.millij.place.{PlaceInYamlConfig, richScopeOf}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScType, ScTypeExt}
 import org.jetbrains.yaml.psi.YAMLScalar
 

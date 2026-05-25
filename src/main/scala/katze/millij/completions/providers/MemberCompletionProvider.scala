@@ -8,22 +8,23 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.ProcessingContext
 import katze.millij.completions.cool.CoolCompletionProvider
 import katze.millij.psi.CompletionPosition
-import katze.millij.{yamlDefinableMembersOfScope, richScopeOf, unwrapMillTask}
+import katze.millij.place.{yamlDefinableMembersOfScope, richScopeOf}
+import katze.millij.scalatypes.unwrapMillTask
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil.inNameContext
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScTemplateDefinition}
 import org.jetbrains.plugins.scala.lang.psi.types.result.Failure
 import org.jetbrains.yaml.psi.YAMLPsiElement
 
-def memberCompletionProvider(logger : Logger) : CoolCompletionProvider[CompletionPosition, YAMLPsiElement *: EmptyTuple] =
+def memberCompletionProvider(logger : Logger) : CoolCompletionProvider[CompletionPosition, YAMLPsiElement] =
   case (
     parameters: CompletionParameters,
     psiElement: CompletionPosition,
-    yamlElement *: EmptyTuple,
+    yamlElement,
     context: ProcessingContext,
     resultSet: CompletionResultSet
   ) =>
-    richScopeOf(psiElement) match
+    richScopeOf(yamlElement) match
       case Left(errValue) =>
         logger.debug(s"Couldn't build completions for $psiElement of class ${psiElement.getClass.getSimpleName}:\n ${errValue}")
       case Right(scope) =>

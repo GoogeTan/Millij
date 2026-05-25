@@ -6,7 +6,7 @@ import com.intellij.openapi.util.text.HtmlChunk
 import com.intellij.psi.PsiElement
 import katze.millij.annotator.{Annotators, CoolAnnotatorAdapter, methodAndFieldAnnotator, mvnDepsAnnotator}
 import katze.millij.cool.{PsiElementMatcher, PsiParent}
-import katze.millij.{PlaceInYamlConfig, yamlDefinableMembersOfScope, richScopeOf}
+import katze.millij.place.{PlaceInYamlConfig, yamlDefinableMembersOfScope, richScopeOf}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScType, ScTypeExt, TypePresentationContext}
 import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping, YAMLScalar}
 

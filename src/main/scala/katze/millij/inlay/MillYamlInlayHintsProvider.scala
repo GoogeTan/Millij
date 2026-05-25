@@ -3,10 +3,10 @@ package katze.millij.inlay
 import com.intellij.codeInsight.hints.declarative.*
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.{PsiElement, PsiFile}
-import katze.millij
+import katze.millij.place.richScopeOf
 import katze.millij.psi.{YAMLKey, YAMLKeyValueWithNotKey}
 import katze.millij.psi.{YAMLChild, YAMLGrandChild}
-import katze.millij.{PlaceInYamlConfig, isExtendsBlock, richScopeOf}
+import katze.millij.place.{PlaceInYamlConfig, isExtendsBlock, richScopeOf}
 import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping, YAMLScalar}
 
 final class MillYamlInlayHintsProvider extends InlayHintsProvider:

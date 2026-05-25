@@ -4,7 +4,7 @@ import cats.syntax.all.*
 import com.intellij.testFramework.UsefulTestCase.assertInstanceOf
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import katze.millij.psi.CompletionPosition
-import org.jetbrains.yaml.psi.YAMLFile
+import org.jetbrains.yaml.psi.{YAMLFile, YAMLPsiElement}
 import org.junit.Assert.assertEquals
 
 def assertAutocomplete(myFixture : CodeInsightTestFixture, text : String, expectedElement : Either[String, TestType]) : Unit =

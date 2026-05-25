@@ -11,7 +11,7 @@ import katze.millij.completions.insert
 import katze.millij.completions.insert.{ExtendsArrayInsertHandler, YamlKeyInsertHandler}
 import katze.millij.scalatypes.searchForOverridableTraits
 import katze.millij.psi.*
-import katze.millij.{completions, isExtendsBlock}
+import katze.millij.place.isExtendsBlock
 import org.jetbrains.yaml.psi.*
 
 import scala.jdk.CollectionConverters.*

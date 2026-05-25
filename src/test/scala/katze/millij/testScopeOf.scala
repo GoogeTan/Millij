@@ -1,7 +1,7 @@
 package katze.millij
 
 import cats.data.*
-import katze.millij.scopeOf
+import katze.millij.place.{YAMLConfigResolver, placeOf}
 import katze.millij.psi.CompletionPosition
 import org.jetbrains.yaml.psi.{YAMLMapping, YAMLScalar, YAMLSequence}
 
@@ -9,27 +9,38 @@ import scala.jdk.CollectionConverters.*
 import cats.syntax.all.*
 import com.intellij.psi.PsiElement
 import katze.millij.TestType
+import org.jetbrains.yaml.psi.YAMLPsiElement
 
 def testScopeOf(element: CompletionPosition): Either[Chain[String], TestType] =
-  scopeOf[[T] =>> Either[Chain[String], T], TestType](
-    element = element,
-    fieldScope = (original, field) => Right(TestType.MemberOf(original, field)),
-    objectScope = (original, name, psi) =>
+  type F[A] = Either[Chain[String], A]
+  val resolver = new YAMLConfigResolver[F, TestType]:
+    override def field(parent: TestType, name: String): F[TestType] = Right(TestType.MemberOf(parent, name))
+
+    override def module(parent: TestType, name: String, mapping: YAMLMapping): F[TestType] =
       if name.startsWith("object ") then
-        extendsOf(psi)
+        extendsOf(mapping)
           .leftMap(_.map(_.toString))
           .map(opt => TestType.ClassFromName(opt.getOrElse(List.empty)))
       else
-        Right(TestType.MemberOf(original, name)),
-    sequenceScope = original => Right(TestType.UnSeqOf(original)),
-    extendsOf = mapping =>
+        Right(TestType.MemberOf(parent, name))
+
+    override def sequenceItem(parent: TestType): F[TestType] = Right(TestType.UnSeqOf(parent))
+
+    override def topLevelModule(mapping: YAMLMapping): F[TestType] =
       extendsOf(mapping)
         .leftMap(_.map(_.toString))
-        .map(opt => TestType.ClassFromName(opt.getOrElse(List.empty))),
-    mappingScope = (original, _) => Right(original),
-    somethingElse = element =>
-      Left(Chain(s"Got unexpected $element"))
+        .map(opt => TestType.ClassFromName(opt.getOrElse(List.empty)))
+
+    override def mapping(parent: TestType, mapping: YAMLMapping): F[TestType] = Right(parent)
+
+    override def onUnexpected(element: YAMLPsiElement): F[TestType] = Left(Chain(s"Got unexpected $element"))
+  val parent = assertMatches(element.getParent,
+    {
+      case yaml: YAMLPsiElement => Some(yaml)
+      case _ => None
+    }
   )
+  placeOf(parent, resolver)
 end testScopeOf
 
 enum ExtendsBeingMalformated:

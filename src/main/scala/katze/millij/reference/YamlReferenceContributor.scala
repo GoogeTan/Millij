@@ -5,6 +5,7 @@ import com.intellij.psi.*
 import org.jetbrains.yaml.psi.*
 import katze.millij.reference.cool.registerCoolReferenceProvider
 import katze.millij.*
+import katze.millij.place.*
 
 class YamlReferenceContributor extends PsiReferenceContributor:
   override def registerReferenceProviders(registrar: PsiReferenceRegistrar): Unit =

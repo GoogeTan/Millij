@@ -9,7 +9,7 @@ import katze.millij.completions.providers.*
 import katze.millij.cool.{CoolPattern, PsiParent}
 import katze.millij.psi.CompletionPosition
 import org.jetbrains.yaml.YAMLLanguage
-import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLScalar, YAMLSequenceItem}
+import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLPsiElement, YAMLScalar, YAMLSequenceItem}
 
 final class YamlCompletionContributor extends CoolCompletionContributor:
   val logger: Logger = Logger.getInstance(classOf[YamlCompletionContributor])
@@ -88,7 +88,7 @@ final class YamlCompletionContributor extends CoolCompletionContributor:
 
   patternExtend(
     CompletionType.BASIC,
-    CoolPattern.element[CompletionPosition] && yamlMavenDependenciesPattern,
+    CoolPattern.elementAndParent[CompletionPosition, YAMLPsiElement]() :* yamlMavenDependenciesPattern,
     _
       .withLanguage(YAMLLanguage.INSTANCE)
       .inVirtualFile(
@@ -97,7 +97,7 @@ final class YamlCompletionContributor extends CoolCompletionContributor:
         )
       ),
   ) {
-    case ((element, text), ctx, resultSet) =>
-      suggestMavenDependency(element, text, resultSet)
+    case ((_, parent, text), ctx, resultSet) =>
+      suggestMavenDependency(parent, text, resultSet)
   }
 end YamlCompletionContributor

@@ -6,7 +6,7 @@ import com.intellij.patterns.{PatternCondition, PsiElementPattern}
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
 import katze.millij.cool.PsiParent
-import katze.millij.isObjectDeclarationText
+import katze.millij.place.isObjectDeclarationText
 import org.jetbrains.yaml.psi.{YAMLDocument, YAMLKeyValue}
 
 opaque type YAMLMillModule <: YAMLDocument | YAMLKeyValue = YAMLDocument | YAMLKeyValue
