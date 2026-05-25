@@ -2,13 +2,16 @@ package katze.millij.inlay
 
 import com.intellij.codeInsight.hints.declarative.*
 import com.intellij.openapi.editor.Editor
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.{PsiElement, PsiFile}
-import katze.millij.place.richScopeOf
+import katze.millij.place.{PlaceConfigResolver, PlaceInYamlConfig, isExtendsBlock, richScopeOf, isObjectDeclarationText}
 import katze.millij.psi.{YAMLKey, YAMLKeyValueWithNotKey}
 import katze.millij.psi.{YAMLChild, YAMLGrandChild}
-import katze.millij.place.{PlaceInYamlConfig, isExtendsBlock, richScopeOf}
+import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping, YAMLScalar}
+import katze.millij.scalatypes.classTypeSearch
 
+//TODO исправить высокую сложность сего файла
 final class MillYamlInlayHintsProvider extends InlayHintsProvider:
   override def createCollector(psiFile: PsiFile, editor: Editor): InlayHintsCollector =
     Collector
@@ -18,14 +21,22 @@ final class MillYamlInlayHintsProvider extends InlayHintsProvider:
       psiElement: PsiElement,
       inlayTreeSink: InlayTreeSink
     ): Unit =
-      val maybeScope = psiElement match
+      val (fieldName, parentScope) = psiElement match
         case YAMLChild(scalar : YAMLScalar, mapping : YAMLMapping) =>
-          richScopeOf(scalar)
-        case YAMLGrandChild(YAMLKey(self), kv : YAMLKeyValue, mapping : YAMLMapping) if kv.getValue != null && !isExtendsBlock(kv.getKeyText) =>
-          //TODO сделать поддержку, если значения нет(но мы знаем его тип всё ещё по идее)
-          richScopeOf(kv.getValue)
+          (scalar.getTextValue, richScopeOf(scalar))
+        case YAMLGrandChild(YAMLKey(self), kv : YAMLKeyValue, mapping : YAMLMapping) if !isExtendsBlock(kv.getKeyText) && !isObjectDeclarationText(kv.getKeyText) =>
+          (kv.getKeyText, richScopeOf(kv))
         case _ =>
           return
+      val maybeScope = parentScope.flatMap(parentScope =>
+          val project = psiElement.getProject
+          val search = (text :String) =>
+            Right(classTypeSearch(ScalaPsiManager.instance(project), GlobalSearchScope.allScope(project), text))
+          PlaceConfigResolver(search).field(
+            parentScope,
+            fieldName
+          )
+        )
       val scope = maybeScope.fold(
         error =>
           println(s"Inlay rich scope error: ${error}")
