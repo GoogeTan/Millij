@@ -29,7 +29,7 @@ end cleanElementTextFromDummyIdentifier
 
 def suggestMavenDependency(element: CompletionPosition, dependencyText: String, resultSet: CompletionResultSet): Unit =
   richScopeOf(element).foreach:
-    case CurrentScope.OverrideRightHandSide(_, _, expectedType, _) if expectedType.canonicalText.endsWith("Dep") =>
+    case PlaceInYamlConfig.Member(_, _, expectedType, _) if expectedType.canonicalText.endsWith("Dep") =>
       MavenDependencyShared.searchAndSuggestDependencies(resultSet, "3.0.0", element.getProject, "com.google.code.gson:gs")
     case _ =>
 end suggestMavenDependency

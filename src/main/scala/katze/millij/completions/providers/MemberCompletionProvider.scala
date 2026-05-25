@@ -8,7 +8,7 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.ProcessingContext
 import katze.millij.completions.cool.CoolCompletionProvider
 import katze.millij.psi.CompletionPosition
-import katze.millij.{parameterLessMembersOfTheScope, richScopeOf, unwrapMillTask}
+import katze.millij.{yamlDefinableMembersOfScope, richScopeOf, unwrapMillTask}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil.inNameContext
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScTemplateDefinition}
@@ -27,7 +27,7 @@ def memberCompletionProvider(logger : Logger) : CoolCompletionProvider[Completio
       case Left(errValue) =>
         logger.debug(s"Couldn't build completions for $psiElement of class ${psiElement.getClass.getSimpleName}:\n ${errValue}")
       case Right(scope) =>
-        parameterLessMembersOfTheScope(scope)
+        yamlDefinableMembersOfScope(scope)
           .filter(member => !scope.definedMembers.contains(member.name))
           .map(makeLookupElementForTypedDefinition(_, logger))
           .foreach(resultSet.addElement)

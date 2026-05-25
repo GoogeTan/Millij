@@ -13,11 +13,12 @@ import org.jetbrains.yaml.psi.*
 import scala.jdk.CollectionConverters.*
 import scala.util.matching.Regex
 
-val objectNameRegex: Regex = "[a-zA-Z_$][\\w$]*$".r
-
-val objectRegex = s"object $objectNameRegex".r
 
 def isObjectDeclarationText(text : String) : Boolean =
+  val objectNameRegex: Regex = "[a-zA-Z_$][\\w$]*$".r
+  
+  val objectRegex = s"object $objectNameRegex".r
+
   objectRegex.matches(text)
 end isObjectDeclarationText
 
@@ -78,35 +79,36 @@ end scopeOf
 
 def richScopeOf(
   currentElement : YAMLPsiElement | CompletionPosition,
-): Either[String, CurrentScope[ScType]] =
+): Either[String, PlaceInYamlConfig[ScType]] =
   val project = currentElement.getProject
   val search = (text :String) =>
     Right(classTypeSearch(ScalaPsiManager.instance(project), GlobalSearchScope.allScope(project), text))
-  scopeOf[[T] =>> Either[String, T], CurrentScope[ScType]](
+  scopeOf[[T] =>> Either[String, T], PlaceInYamlConfig[ScType]](
     element = currentElement,
-    fieldScope = (scope, field) => fieldScope(scope, field).toRight(s"Couldn't find field $field in scope $scope"),
-    objectScope = objectScope(
-      _,
-      _,
-      _,
-      search,
-      scope => Left(s"Expected object body but got method right hand side ${scope.name} with type ${scope.expectedType}")
+    fieldScope = (scope, field) => memberPlace(scope, field).toRight(s"Couldn't find field $field in scope $scope"),
+    objectScope = 
+      (parentPlace, _, modulePsiElement) =>
+        nestedModulePlaceFromYamlMapping(
+          parentPlace,
+          modulePsiElement,
+          search,
+          scope => Left(s"Expected object body but got method right hand side ${scope.name} with type ${scope.expectedType}")
+        ),
+    sequenceScope = scope => sequenceElementPlace[[T] =>> Either[String, T]](
+      scope = scope,
+      onObjectDefinition = Left(s"Expected RHS but got object $scope"),
+      onNotSeq = Left(s"Expected sequence scope but got $scope"),
     ),
-    sequenceScope = scope => sequenceScope[[T] =>> Either[String, T]](
-      scope,
-      Left(s"Expected RHS but got object $scope"),
-      Left(s"Expected sequence scope but got $scope"),
-    ),
-    extendsOf = extendsOf[[X] =>> Either[String, X], ScType](_, search),
+    extendsOf = modulePlaceOfYamlMapping[[X] =>> Either[String, X], ScType](_, search),
     mappingScope = (scope, mapping) =>
       scope match
-        case CurrentScope.ObjectDefinition(extendList, definedMembers) =>
-          CurrentScope.ObjectDefinition(
+        case PlaceInYamlConfig.Module(extendList, definedMembers) =>
+          PlaceInYamlConfig.Module(
             extendList = extendList,
             definedMembers = mapping.getKeyValues.asScala.map(_.getKeyText).toList
           ).pure
-        case CurrentScope.OverrideRightHandSide(parentTypes, name, expectedType, definedMembers) =>
-          CurrentScope.OverrideRightHandSide(
+        case PlaceInYamlConfig.Member(parentTypes, name, expectedType, definedMembers) =>
+          PlaceInYamlConfig.Member(
             parentTypes = parentTypes,
             name = name,
             expectedType = expectedType,

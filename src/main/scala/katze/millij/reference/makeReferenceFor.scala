@@ -3,7 +3,7 @@ package katze.millij.reference
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.icons.AllIcons
 import com.intellij.psi.{NavigatablePsiElement, PsiElement, PsiReference, PsiReferenceBase}
-import katze.millij.{parameterLessMembersOfTheScope, richScopeOf}
+import katze.millij.{yamlDefinableMembersOfScope, richScopeOf}
 import katze.millij.psi.CompletionPosition
 import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLPsiElement, YAMLScalar}
 
@@ -17,7 +17,7 @@ end makeReferenceFor
 final class YamlMemberReference(element: YAMLPsiElement | CompletionPosition, nameToSearch: String) extends PsiReferenceBase[PsiElement](element):
   override def resolve(): PsiElement =
     richScopeOf(element)
-      .map(parameterLessMembersOfTheScope)
+      .map(yamlDefinableMembersOfScope)
       .fold(
         _ => null,
         variants =>
@@ -30,7 +30,7 @@ final class YamlMemberReference(element: YAMLPsiElement | CompletionPosition, na
 
   override def getVariants: Array[AnyRef] =
     richScopeOf(element)
-      .map(parameterLessMembersOfTheScope)
+      .map(yamlDefinableMembersOfScope)
       .fold(
         _ => Array.empty[AnyRef],
         variants =>

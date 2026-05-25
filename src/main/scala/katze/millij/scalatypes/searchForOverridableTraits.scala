@@ -7,7 +7,12 @@ import com.intellij.psi.search.searches.ClassInheritorsSearch
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import scala.jdk.CollectionConverters.*
 
-def getOverridableModules(project: Project): Option[List[PsiClass]] =
+/**
+ * Finds all subtypes of mill.api.Module.
+ * @param project
+ * @return
+ */
+def searchForOverridableTraits(project: Project): Option[List[PsiClass]] =
   getMillConfigFilesSubproject(project).flatMap(millModule =>
     val buildScope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(millModule)
     val facade = ScalaPsiManager.instance(project)
@@ -16,4 +21,4 @@ def getOverridableModules(project: Project): Option[List[PsiClass]] =
       ClassInheritorsSearch.search(baseModule, buildScope, true).findAll().asScala.toList
     )
   )
-end getOverridableModules
+end searchForOverridableTraits

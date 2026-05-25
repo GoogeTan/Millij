@@ -27,17 +27,17 @@ def unexistingMembersAnnotator(
     end if
 end unexistingMembersAnnotator
 
-def scopeNameForUnexistingMembersAnnotator : CurrentScope[ScType] => String =
-  case CurrentScope.ObjectDefinition(extendList, definedMembers) =>
+def scopeNameForUnexistingMembersAnnotator : PlaceInYamlConfig[ScType] => String =
+  case PlaceInYamlConfig.Module(extendList, definedMembers) =>
     s"module which extends ${extendList.mkString(", ")}"
-  case CurrentScope.OverrideRightHandSide(parentTypes, name, expectedType, definedMembers) =>
+  case PlaceInYamlConfig.Member(parentTypes, name, expectedType, definedMembers) =>
     s"object of type <a href=${expectedType}>${expectedType}</a>"
 end scopeNameForUnexistingMembersAnnotator
 
 def methodAndFieldAnnotator : CoolAnnotator[YAMLKeyValueWithNotKey["extends"], YAMLMapping] =
   case (kv, mapping, annotationHolder) =>
     richScopeOf(kv).foreach:
-      case CurrentScope.ObjectDefinition(extendList, _) =>
+      case PlaceInYamlConfig.Module(extendList, _) =>
         if isObjectDeclarationText(kv.getKeyText) then
           val (objectKeywordRange, nameRange) = objectTextRanges(kv.getKey.getTextRange)
 
@@ -61,7 +61,7 @@ def methodAndFieldAnnotator : CoolAnnotator[YAMLKeyValueWithNotKey["extends"], Y
             .create()
         end if
 
-      case CurrentScope.OverrideRightHandSide(parentTypes, name, expectedType, _) =>
+      case PlaceInYamlConfig.Member(parentTypes, name, expectedType, _) =>
         annotationHolder
           .newSilentAnnotation(HighlightSeverity.INFORMATION)
           .range(kv.getKey)

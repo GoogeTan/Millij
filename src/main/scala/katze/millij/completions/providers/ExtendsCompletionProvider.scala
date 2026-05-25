@@ -9,7 +9,7 @@ import katze.millij
 import katze.millij.completions.cool.CoolCompletionProvider
 import katze.millij.completions.insert
 import katze.millij.completions.insert.{ExtendsArrayInsertHandler, YamlKeyInsertHandler}
-import katze.millij.scalatypes.getOverridableModules
+import katze.millij.scalatypes.searchForOverridableTraits
 import katze.millij.psi.*
 import katze.millij.{completions, isExtendsBlock}
 import org.jetbrains.yaml.psi.*
@@ -54,7 +54,7 @@ def extendsListCompletionProvider : CoolCompletionProvider[
 end extendsListCompletionProvider
 
 def makeExtendsSuggestions(project : Project, exclude : List[String]) : List[LookupElement] =
-  getOverridableModules(project)
+  searchForOverridableTraits(project)
     .toList
     .flatten
     .filter(clazz => !exclude.contains(clazz.getQualifiedName))

@@ -6,7 +6,7 @@ import com.intellij.psi.{PsiElement, PsiFile}
 import katze.millij
 import katze.millij.psi.{YAMLKey, YAMLKeyValueWithNotKey}
 import katze.millij.psi.{YAMLChild, YAMLGrandChild}
-import katze.millij.{CurrentScope, isExtendsBlock, richScopeOf}
+import katze.millij.{PlaceInYamlConfig, isExtendsBlock, richScopeOf}
 import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping, YAMLScalar}
 
 final class MillYamlInlayHintsProvider extends InlayHintsProvider:
@@ -33,8 +33,8 @@ final class MillYamlInlayHintsProvider extends InlayHintsProvider:
         identity
       )
       scope match
-        case CurrentScope.ObjectDefinition(_, _) =>
-        case CurrentScope.OverrideRightHandSide(_, _, expectedType, _) =>
+        case PlaceInYamlConfig.Module(_, _) =>
+        case PlaceInYamlConfig.Member(_, _, expectedType, _) =>
           inlayTreeSink.addPresentation(
             InlineInlayPosition(psiElement.getTextRange.getEndOffset, true, 0),
             null,

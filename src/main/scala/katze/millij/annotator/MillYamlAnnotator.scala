@@ -6,7 +6,7 @@ import com.intellij.openapi.util.text.HtmlChunk
 import com.intellij.psi.PsiElement
 import katze.millij.annotator.{Annotators, CoolAnnotatorAdapter, methodAndFieldAnnotator, mvnDepsAnnotator}
 import katze.millij.cool.{PsiElementMatcher, PsiParent}
-import katze.millij.{CurrentScope, parameterLessMembersOfTheScope, richScopeOf}
+import katze.millij.{PlaceInYamlConfig, yamlDefinableMembersOfScope, richScopeOf}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScType, ScTypeExt, TypePresentationContext}
 import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping, YAMLScalar}
 
@@ -24,16 +24,16 @@ final class MillYamlAnnotator extends Annotators(
 
 def unexistingMembersError(mapping : YAMLMapping, kv : YAMLKeyValue) : Option[String] =
   richScopeOf(mapping).toOption.flatMap(scope =>
-    val possibleMembers = parameterLessMembersOfTheScope(scope)
+    val possibleMembers = yamlDefinableMembersOfScope(scope)
     if possibleMembers.exists(_.getName() === kv.getKeyText) then
       None
     else
       given context: TypePresentationContext = TypePresentationContext(kv)
 
       val scopeText = scope match
-        case CurrentScope.ObjectDefinition(extendList, definedMembers) =>
+        case PlaceInYamlConfig.Module(extendList, definedMembers) =>
           "module that extends " + extendList.map(typeReference).mkString(", ")
-        case CurrentScope.OverrideRightHandSide(parentTypes, name, expectedType, definedMembers) =>
+        case PlaceInYamlConfig.Member(parentTypes, name, expectedType, definedMembers) =>
           s"object of type ${typeReference(expectedType)}</a>"
 
       Some(
