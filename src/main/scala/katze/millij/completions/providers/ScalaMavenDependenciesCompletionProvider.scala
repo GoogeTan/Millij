@@ -8,6 +8,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScInterpolatedStringLiteral
 
 import scala.util.matching.Regex
 
+/**
+ * Adds maven dependencies suggestions for mvn"" interpolator
+ * @see [[katze.millij.completions.providers.suggestMavenDependency]] for YAML conterpart
+ */
 object ScalaMavenDependenciesCompletionProvider extends CompletionProvider[CompletionParameters]:
   override def addCompletions(
     v: CompletionParameters,

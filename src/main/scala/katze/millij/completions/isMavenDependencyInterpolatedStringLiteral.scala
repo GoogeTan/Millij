@@ -6,6 +6,6 @@ import com.intellij.psi.{PsiElement, PsiFile}
 import com.intellij.util.ThreeState
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScInterpolatedStringLiteral
 
-def isMvnDependencyInterpolatedString(sc : ScInterpolatedStringLiteral) : Boolean =
+def isMavenDependencyInterpolatedStringLiteral(sc : ScInterpolatedStringLiteral) : Boolean =
   sc.referenceName == "mvn" || sc.referenceName == "ivy"
-end isMvnDependencyInterpolatedString
+end isMavenDependencyInterpolatedStringLiteral

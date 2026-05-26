@@ -10,6 +10,9 @@ import katze.millij.data.ScalaVersionCacheService
 import katze.millij.psi.*
 import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping, YAMLScalar}
 
+/**
+ * Adds completions for `scalaVersion` field of `ScalaModule`
+ */
 def scalaVersionCompletionProvider : CoolCompletionProvider[
   CompletionPosition,
   YAMLScalar *: YAMLKeyValue *: YAMLMapping *: YAMLMillModule *: EmptyTuple

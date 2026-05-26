@@ -9,10 +9,9 @@ import katze.millij.cool.{CoolPattern, PsiElementMatcher, PsiParent}
 
 import scala.reflect.ClassTag
 
-inline def psiClass[T <: PsiElement](using ct: ClassTag[T]): Class[T] =
-  ct.runtimeClass.asInstanceOf[Class[T]]
-end psiClass
-
+/**
+ * Adds [[CoolPattern]] based methods to [[CompletionContributor]]
+ */
 trait CoolCompletionContributor extends CompletionContributor:
   private val LOG = Logger.getInstance(classOf[CoolCompletionContributor])
 

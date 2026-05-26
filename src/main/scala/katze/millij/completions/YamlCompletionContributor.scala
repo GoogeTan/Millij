@@ -11,6 +11,7 @@ import katze.millij.psi.CompletionPosition
 import org.jetbrains.yaml.YAMLLanguage
 import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLPsiElement, YAMLScalar, YAMLSequenceItem}
 
+//TODO split into dumb aware and not dumb aware versions
 final class YamlCompletionContributor extends CoolCompletionContributor:
   val logger: Logger = Logger.getInstance(classOf[YamlCompletionContributor])
 

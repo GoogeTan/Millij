@@ -16,6 +16,16 @@ import org.jetbrains.yaml.psi.*
 
 import scala.jdk.CollectionConverters.*
 
+/**
+ * Adds completions for extends block with single trait to implement:
+ * 
+ * For
+ * ```YAML
+ * object moduleA:
+ *  extends: ScalaMo<caret>
+ * ```
+ * will suggest ScalaModule
+ */
 def extendsValueCompletionProvider : CoolCompletionProvider[
   CompletionPosition,
   YAMLScalar *: YAMLKeyValue *: YAMLMapping *: YAMLMillModule *: EmptyTuple
@@ -33,6 +43,16 @@ def extendsValueCompletionProvider : CoolCompletionProvider[
     end if
 end extendsValueCompletionProvider
 
+/**
+ * Adds completions for extends block with list of traits to implement:
+ *
+ * For
+ * ```YAML
+ * object moduleA:
+ *  extends: [PublishModule, ScalaMo<caret>]
+ * ```
+ * will suggest ScalaModule
+ */
 def extendsListCompletionProvider : CoolCompletionProvider[
   CompletionPosition,
   YAMLScalar *: YAMLSequenceItem *: YAMLSequence *: YAMLKeyValueWithKey["extends"] *: YAMLMapping *: YAMLMillModule *: EmptyTuple
@@ -53,6 +73,11 @@ def extendsListCompletionProvider : CoolCompletionProvider[
       .foreach(resultSet.addElement)
 end extendsListCompletionProvider
 
+/**
+ * Finds all the traits that are Modules and excludes those that the module already extends.
+ * @param exclude Already extended classes.
+ * @return
+ */
 def makeExtendsSuggestions(project : Project, exclude : List[String]) : List[LookupElement] =
   searchForOverridableTraits(project)
     .toList
@@ -68,6 +93,16 @@ def makeExtendsSuggestions(project : Project, exclude : List[String]) : List[Loo
     )
 end makeExtendsSuggestions
 
+/**
+ * Adds completions for extends keyword when it is being typed inside existing key-value pair
+ * 
+ * ```YAML
+ * object moduleA:
+ *  ext<caret>:
+ * ```
+ * 
+ * Note that it is fired only when there is : after the caret.
+ */
 def extendsExistingKeyCompletionProvider : CoolCompletionProvider[
   YAMLKey[CompletionPosition],
   YAMLKeyValue *: YAMLMapping *: YAMLMillModule *: EmptyTuple
@@ -83,11 +118,28 @@ def extendsExistingKeyCompletionProvider : CoolCompletionProvider[
       .create("extends")
       .withPresentableText("extends")
       .withTypeText("classes to extend")
-      .withInsertHandler(YamlKeyInsertHandler)//TODO add second autocompletion that adds []
+      .withInsertHandler(YamlKeyInsertHandler)
+
+    resultSet.addElement(
+      LookupElementBuilder
+        .create("extends")
+        .withPresentableText("extends: []")
+        .withInsertHandler(ExtendsArrayInsertHandler)
+    )
 
     resultSet.addElement(lookupElement)
 end extendsExistingKeyCompletionProvider
 
+/**
+ * Adds completions for extends keyword when it is being typed in module body
+ *
+ * ```YAML
+ * object moduleA:
+ *  ext<caret>
+ * ```
+ * 
+ * Note that it is not fired when there is : after the caret.
+ */
 def extendsNewKeyCompletionProvider : CoolCompletionProvider[
   CompletionPosition,
   YAMLScalar *: YAMLMapping *: YAMLMillModule *: EmptyTuple

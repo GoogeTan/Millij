@@ -16,6 +16,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScTe
 import org.jetbrains.plugins.scala.lang.psi.types.result.Failure
 import org.jetbrains.yaml.psi.YAMLPsiElement
 
+/**
+ * Adds completions for module members and object params.
+ */
 def memberCompletionProvider(logger : Logger) : CoolCompletionProvider[CompletionPosition, YAMLPsiElement] =
   case (
     parameters: CompletionParameters,
@@ -70,6 +73,9 @@ def logEncounterOfAnUnknownTypeWhileMakingLookup(definition : ScTypedDefinition,
       )
 end logEncounterOfAnUnknownTypeWhileMakingLookup
 
+/**
+ * Tries to look up place where member was defined
+ */
 def enclosingEntity : ScTypedDefinition => Option[ScTemplateDefinition] =
   case inNameContext(member: ScMember) =>
     Option(member.containingClass)
