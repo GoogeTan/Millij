@@ -7,6 +7,9 @@ import katze.millij.scalatypes.classTypeSearch
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.yaml.psi.{YAMLScalar, YAMLSequence, YAMLSequenceItem}
 
+/**
+ * Marks unfound classes in extends block with error
+ */
 def extendsListBlockAnnotator(
   isValidExtendsBlockMember : YAMLScalar => Boolean,
 ): CoolAnnotator[

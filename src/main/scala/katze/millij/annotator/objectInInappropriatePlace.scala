@@ -7,6 +7,9 @@ import org.jetbrains.yaml.psi.{YAMLDocument, YAMLKeyValue, YAMLMapping}
 
 import scala.annotation.tailrec
 
+/**
+ * Annotates objects declaration with error if it is defined in inappropriate place.
+ */
 def objectInInappropriatePlace : CoolAnnotator[(YAMLKeyValue, YAMLMapping)] =
   case ((kv, _), annotationHolder) =>
     @tailrec

@@ -13,6 +13,10 @@ def isMvnDependency(tie : ScType) : Boolean =
     .getOrElse(false)
 end isMvnDependency
 
+/**
+ * Annotates maven dependency strings(e.g. in mvnDeps blocks).
+ * TODO make it work for partially written strings to
+ */
 def mvnDepsAnnotator : CoolAnnotator[YAMLScalar] =
   case (scalar, annotationHolder) =>
     // Нас тут не интересуют ошибки вида не нашлось поле extends и так далее. Поэтосу можно забить на ошибки

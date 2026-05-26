@@ -9,6 +9,9 @@ import katze.millij.psi.*
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping}
 
+/**
+ * Marks element as error if it is a not a correct member of scope.
+ */
 def unexistingMembersAnnotator(
   checkIfItIsACorrectMember : (YAMLMapping, YAMLKeyValue) => Option[String]
 ) : CoolAnnotator[(YAMLKey[PsiElement], YAMLKeyValue, YAMLMapping)] =
@@ -35,6 +38,9 @@ def scopeNameForUnexistingMembersAnnotator : PlaceInYamlConfig[ScType] => String
     s"object of type <a href=$expectedType>$expectedType</a>"
 end scopeNameForUnexistingMembersAnnotator
 
+/**
+ * Annotates keys of module declaration, object parameter declaration, module member declaration. 
+ */
 def methodAndFieldAnnotator : CoolAnnotator[(YAMLKeyValueWithNotKey["extends"], YAMLMapping)] =
   case ((kv, mapping), annotationHolder) =>
     richScopeOf(kv).foreach:
