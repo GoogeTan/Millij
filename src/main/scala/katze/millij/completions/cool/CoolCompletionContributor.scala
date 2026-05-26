@@ -5,7 +5,7 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.patterns.{ElementPattern, PlatformPatterns, PsiElementPattern}
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
-import katze.millij.cool.{CoolPattern, PsiElementMatcher, PsiParent}
+import katze.millij.cool.{CoolPattern, PsiElementMatcher, PsiParentElementMatcher}
 
 import scala.reflect.ClassTag
 
@@ -42,7 +42,7 @@ trait CoolCompletionContributor extends CompletionContributor:
       
   def coolExtend[
     Element <: PsiElement : PsiElementMatcher as pem,
-    Parents  : PsiParent as psiParents
+    Parents  : PsiParentElementMatcher as psiParents
   ](
     `type`: CompletionType,
     provider: CoolCompletionProvider[Element, Parents],

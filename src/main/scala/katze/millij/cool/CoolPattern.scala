@@ -96,14 +96,14 @@ end CoolPattern
 object CoolPattern:
   def elementAndParent[
     Element <: PsiElement : PsiElementMatcher as PEM,
-    Parent : PsiParent as PP,
+    Parent : PsiParentElementMatcher as PP,
   ](level : Int = 1) : CoolPattern[(Element, Parent)] =
     element && parent(level)
   end elementAndParent
   
   def elementAndParents[
     Element <: PsiElement : PsiElementMatcher as PEM,
-    Parent <: Tuple : PsiParent as PP,
+    Parent <: Tuple : PsiParentElementMatcher as PP,
   ](level : Int = 1) : CoolPattern[Element *: Parent] =
     element[Element] *: parent[Parent](level)
   end elementAndParents
@@ -115,7 +115,7 @@ object CoolPattern:
     )
   end element
 
-  def parent[Parent : PsiParent as PP](level : Int = 1) : CoolPattern[Parent] =
+  def parent[Parent : PsiParentElementMatcher as PP](level : Int = 1) : CoolPattern[Parent] =
     CoolPattern(
       PP.appendTo(
         psiElement(),

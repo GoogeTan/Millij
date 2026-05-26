@@ -4,7 +4,7 @@ import cats.syntax.all.*
 import com.intellij.patterns.{PatternCondition, PlatformPatterns, PsiElementPattern}
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
-import katze.millij.cool.{PsiElementMatcher, PsiParent}
+import katze.millij.cool.{PsiElementMatcher, PsiParentElementMatcher}
 import katze.millij.psi.YAMLKeyValueWithNotKey as keyValuePairWithMatcher
 import org.jetbrains.yaml.psi.YAMLKeyValue
 
@@ -40,7 +40,7 @@ object YAMLKeyValueWithNotKey:
     end extract
   end keyValuePairWithMatcher
 
-  given keyValuePairWithParent[Key <: String](using valueOf: ValueOf[Key]): PsiParent[YAMLKeyValueWithNotKey[Key]] with
+  given keyValuePairWithParentElementMatcher[Key <: String](using valueOf: ValueOf[Key]): PsiParentElementMatcher[YAMLKeyValueWithNotKey[Key]] with
     private val expectedKey: String = valueOf.value
 
     override def appendTo[V <: PsiElement](
@@ -62,6 +62,6 @@ object YAMLKeyValueWithNotKey:
           Some(kv)
         case _ =>
           None
-  end keyValuePairWithParent
+  end keyValuePairWithParentElementMatcher
 end YAMLKeyValueWithNotKey
 

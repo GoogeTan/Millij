@@ -3,7 +3,7 @@ package katze.millij.psi
 import com.intellij.patterns.{PatternCondition, PlatformPatterns, PsiElementPattern}
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
-import katze.millij.cool.{PsiElementMatcher, PsiParent}
+import katze.millij.cool.{PsiElementMatcher, PsiParentElementMatcher}
 import org.jetbrains.yaml.psi.YAMLKeyValue
 
 import scala.reflect.{ClassTag, TypeTest, classTag}
@@ -51,7 +51,7 @@ object YAMLKey:
     end extract
   end valueNodeMatcher
 
-  given valueNodePsiParent[T <: PsiElement : ClassTag](using tt: TypeTest[PsiElement, T]): PsiParent[YAMLKey[T]] with
+  given valueNodePsiParentElementMatcher[T <: PsiElement : ClassTag](using tt: TypeTest[PsiElement, T]): PsiParentElementMatcher[YAMLKey[T]] with
 
     override def appendTo[V <: PsiElement](
       value: PsiElementPattern.Capture[V],
@@ -77,6 +77,6 @@ object YAMLKey:
       }.map(_.asInstanceOf[YAMLKey[T]])
     end test
 
-  end valueNodePsiParent
+  end valueNodePsiParentElementMatcher
 end YAMLKey
 

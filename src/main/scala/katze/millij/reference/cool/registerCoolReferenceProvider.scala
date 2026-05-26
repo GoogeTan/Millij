@@ -3,12 +3,12 @@ package katze.millij.reference.cool
 import com.intellij.patterns.{ElementPattern, PsiElementPattern}
 import com.intellij.psi.{PsiElement, PsiReference, PsiReferenceProvider, PsiReferenceRegistrar}
 import com.intellij.util.ProcessingContext
-import katze.millij.cool.{PsiElementMatcher, PsiParent}
+import katze.millij.cool.{PsiElementMatcher, PsiParentElementMatcher}
 
 extension(psiReferenceRegistrar : PsiReferenceRegistrar)
   final def registerCoolReferenceProvider[
     Element <: PsiElement : PsiElementMatcher as pem,
-    Parents  : PsiParent as psiParents
+    Parents  : PsiParentElementMatcher as psiParents
   ](
     coolPsiReferenceProvider: CoolPsiReferenceProvider[Element, Parents],
     place: PsiElementPattern.Capture[Element] => ElementPattern[? <: PsiElement]

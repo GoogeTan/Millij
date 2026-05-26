@@ -4,13 +4,13 @@ import com.intellij.psi.PsiElement
 import com.intellij.testFramework.UsefulTestCase.assertInstanceOf
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import katze.millij.completions.cool.CoolCompletionProvider
-import katze.millij.cool.{PsiElementMatcher, PsiParent}
+import katze.millij.cool.{PsiElementMatcher, PsiParentElementMatcher}
 import org.jetbrains.yaml.psi.YAMLFile
 import org.junit.Assert.assertTrue
 
 def assertCoolCompletionMatch[
   Element <: PsiElement : PsiElementMatcher as pem,
-  Parents : PsiParent as psiParents
+  Parents : PsiParentElementMatcher as psiParents
 ](
   myFixture: CodeInsightTestFixture,
   text: String,

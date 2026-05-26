@@ -5,7 +5,7 @@ import com.intellij.patterns.StandardPatterns.or
 import com.intellij.patterns.{PatternCondition, PsiElementPattern}
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
-import katze.millij.cool.PsiParent
+import katze.millij.cool.PsiParentElementMatcher
 import katze.millij.place.isObjectDeclarationText
 import org.jetbrains.yaml.psi.{YAMLDocument, YAMLKeyValue}
 
@@ -15,7 +15,7 @@ import org.jetbrains.yaml.psi.{YAMLDocument, YAMLKeyValue}
 opaque type YAMLMillModule <: YAMLDocument | YAMLKeyValue = YAMLDocument | YAMLKeyValue
 
 object YAMLMillModule:
-  given ModulePsiParent : PsiParent[YAMLMillModule] with
+  given ModulePsiParentElementMatcher : PsiParentElementMatcher[YAMLMillModule] with
     override def appendTo[V <: PsiElement](value: PsiElementPattern.Capture[V], level: Int): PsiElementPattern.Capture[V] =
       value.withSuperParent(
         level,
@@ -33,7 +33,7 @@ object YAMLMillModule:
         case _ => None
       end match
     end test
-  end ModulePsiParent
+  end ModulePsiParentElementMatcher
 
   object ModulePatternCondition extends PatternCondition[YAMLKeyValue]("yamlMillModuleKvTester"):
     override def accepts(t: YAMLKeyValue, processingContext: ProcessingContext): Boolean =

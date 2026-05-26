@@ -5,7 +5,7 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.text.HtmlChunk
 import com.intellij.psi.PsiElement
 import katze.millij.annotator.{Annotators, CoolAnnotatorAdapter, methodAndFieldAnnotator, mvnDepsAnnotator}
-import katze.millij.cool.{CoolPattern, PsiElementMatcher, PsiParent}
+import katze.millij.cool.{CoolPattern, PsiElementMatcher, PsiParentElementMatcher}
 import katze.millij.place.{PlaceInYamlConfig, richScopeOf, yamlDefinableMembersOfScope}
 import katze.millij.psi.*
 import org.jetbrains.plugins.scala.lang.psi.types.{ScType, ScTypeExt, TypePresentationContext}

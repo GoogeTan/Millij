@@ -7,6 +7,11 @@ import katze.millij.psi.CompletionPosition
 
 import scala.reflect.{ClassTag, TypeTest}
 
+/**
+ * Allows to make [[PsiElementPattern.Capture]] of T in a typeface way. 
+ * 
+ * @example It is useful for union types. See [[CompletionPosition]] and [[PsiElementMatcher.completionPositionPsiElementMatcher]]
+ */
 trait PsiElementMatcher[T <: PsiElement]:
   def capture: PsiElementPattern.Capture[T]
   def extract[K <: PsiElement](element: K): Option[element.type & T]
@@ -22,7 +27,7 @@ object PsiElementMatcher:
     end extract
   end defaultMatcher
 
-  given PsiElementMatcher[CompletionPosition] with
+  given completionPositionPsiElementMatcher : PsiElementMatcher[CompletionPosition] with
     override def capture: PsiElementPattern.Capture[CompletionPosition] =
       PlatformPatterns.psiElement(classOf[PsiElement])
         .and(
@@ -39,6 +44,7 @@ object PsiElementMatcher:
         case e: PsiWhiteSpace   => Some(e.asInstanceOf[element.type & PsiWhiteSpace])
         case e: PsiErrorElement => Some(e.asInstanceOf[element.type & PsiErrorElement])
         case _                  => None
+      end match
     end extract
-  end given
+  end completionPositionPsiElementMatcher
 end PsiElementMatcher

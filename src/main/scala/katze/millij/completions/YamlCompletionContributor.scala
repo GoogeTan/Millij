@@ -6,7 +6,7 @@ import com.intellij.patterns.{PlatformPatterns, StandardPatterns}
 import com.intellij.psi.PsiElement
 import katze.millij.completions.cool.CoolCompletionContributor
 import katze.millij.completions.providers.*
-import katze.millij.cool.{CoolPattern, PsiParent}
+import katze.millij.cool.{CoolPattern, PsiParentElementMatcher}
 import katze.millij.psi.CompletionPosition
 import org.jetbrains.yaml.YAMLLanguage
 import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLPsiElement, YAMLScalar, YAMLSequenceItem}

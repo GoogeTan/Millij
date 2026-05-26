@@ -2,21 +2,27 @@ package katze.millij.cool
 
 import com.intellij.patterns.{PsiElementPattern, StandardPatterns}
 import com.intellij.psi.PsiElement
+import katze.millij.psi.CompletionPosition
 
 import scala.reflect.{ClassTag, TypeTest, classTag}
 
-trait PsiParent[T]:
+/**
+ * Allows to match over parents of PsiElementPattern.Capture with extraction of data of type T. 
+ * 
+ * Usually T it is some PsiElement which we expect to be a parent at some level. For complex data extraction use
+ * [[CoolPattern]]
+ */
+trait PsiParentElementMatcher[T]:
   def appendTo[V <: PsiElement](
     value : PsiElementPattern.Capture[V],
     level : Int = 1
   ) : PsiElementPattern.Capture[V]
-
-  //TODO replace with TypeTest
+  
   def test(value : PsiElement) : Option[T]
-end PsiParent
+end PsiParentElementMatcher
 
-object PsiParent:
-  given clazzPsiParent[Element <: PsiElement : ClassTag](using tt: TypeTest[PsiElement, Element]) : PsiParent[Element] with
+object PsiParentElementMatcher:
+  given clazzPsiParentElementMatcher[Element <: PsiElement : ClassTag](using tt: TypeTest[PsiElement, Element]) : PsiParentElementMatcher[Element] with
     override def appendTo[V <: PsiElement](
       value: PsiElementPattern.Capture[V],
       level: Int
@@ -30,12 +36,12 @@ object PsiParent:
     override def test(value: PsiElement): Option[Element] =
       tt.unapply(value)
     end test
-  end clazzPsiParent
+  end clazzPsiParentElementMatcher
 
-  given unionPsiParent[
-    Element1 : PsiParent as EPP1,
-    Element2 : PsiParent as EPP2,
-  ]: PsiParent[Either[Element1, Element2]]
+  given unionPsiParentElementMatcher[
+    Element1 : PsiParentElementMatcher as EPP1,
+    Element2 : PsiParentElementMatcher as EPP2,
+  ]: PsiParentElementMatcher[Either[Element1, Element2]]
    with
     override def appendTo[V <: PsiElement](
       value: PsiElementPattern.Capture[V],
@@ -58,13 +64,13 @@ object PsiParent:
     override def test(value: PsiElement): Option[Either[Element1, Element2]] =
       EPP1.test(value).map(Left(_)).orElse(EPP2.test(value).map(Right(_)))
     end test
-  end unionPsiParent
+  end unionPsiParentElementMatcher
 
 
-  given inductivePsiParent[
-    Head : PsiParent as HPP,
-    Tail <: Tuple : PsiParent as TCT
-  ]: PsiParent[Head *: Tail] with
+  given inductivePsiParentElementMatcher[
+    Head : PsiParentElementMatcher as HPP,
+    Tail <: Tuple : PsiParentElementMatcher as TCT
+  ]: PsiParentElementMatcher[Head *: Tail] with
     override def appendTo[V <: PsiElement](
       value: PsiElementPattern.Capture[V],
       level : Int
@@ -81,9 +87,9 @@ object PsiParent:
     override def test(value: PsiElement): Option[Head *: Tail] =
       HPP.test(value).zip(TCT.test(value.getParent)).map(_ *: _)
     end test
-  end inductivePsiParent
+  end inductivePsiParentElementMatcher
 
-  given leafPsiParent: PsiParent[EmptyTuple] with
+  given leafPsiParentElementMatcher: PsiParentElementMatcher[EmptyTuple] with
     override def appendTo[V <: PsiElement](
       value: PsiElementPattern.Capture[V],
       level: Int
@@ -94,5 +100,5 @@ object PsiParent:
     override def test(value: PsiElement): Option[EmptyTuple] =
       Some(EmptyTuple)
     end test
-  end leafPsiParent
-end PsiParent
+  end leafPsiParentElementMatcher
+end PsiParentElementMatcher

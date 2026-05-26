@@ -3,7 +3,7 @@ package katze.millij.psi
 import com.intellij.patterns.{PatternCondition, PlatformPatterns, PsiElementPattern}
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
-import katze.millij.cool.{PsiElementMatcher, PsiParent}
+import katze.millij.cool.{PsiElementMatcher, PsiParentElementMatcher}
 import org.jetbrains.yaml.psi.YAMLKeyValue
 
 /**
@@ -34,7 +34,7 @@ object YAMLKeyValueWithKey:
     end extract
   end keyValuePairWithMatcher
 
-  given keyValuePairWithParent[Key <: String](using valueOf: ValueOf[Key]): PsiParent[YAMLKeyValueWithKey[Key]] with
+  given keyValuePairWithParentElementMatcher[Key <: String](using valueOf: ValueOf[Key]): PsiParentElementMatcher[YAMLKeyValueWithKey[Key]] with
     private val expectedKey: String = valueOf.value
 
     override def appendTo[V <: PsiElement](
@@ -56,6 +56,6 @@ object YAMLKeyValueWithKey:
           Some(kv)
         case _ =>
           None
-  end keyValuePairWithParent
+  end keyValuePairWithParentElementMatcher
 end YAMLKeyValueWithKey
 
