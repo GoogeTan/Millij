@@ -26,7 +26,9 @@ final class MillYamlAnnotator extends Annotators(
       CoolPattern.element
     ),
     CoolAnnotatorAdapter(
-      extendsListBlockAnnotator(isValidExtendsBlockMember),
+      extendsListBlockAnnotator(element =>
+        Option.when(!isValidExtendsBlockMember(element))(unexistingTraitNameError(element.getTextValue))
+      ),
       CoolPattern.elementAndParent[
         YAMLScalar,
         Either[
@@ -61,6 +63,11 @@ def unexistingMembersError(mapping : YAMLMapping, kv : YAMLKeyValue) : Option[St
       )
   )
 end unexistingMembersError
+
+def unexistingTraitNameError(name : String) : String =
+  s"Couldn't find trait with name ${name}"
+end unexistingTraitNameError
+  
 
 def typeReference(scType : ScType)(using TypePresentationContext) : String =
   //TODO fix go to definition

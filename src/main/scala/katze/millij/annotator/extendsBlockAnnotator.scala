@@ -11,7 +11,7 @@ import org.jetbrains.yaml.psi.{YAMLScalar, YAMLSequence, YAMLSequenceItem}
  * Marks unfound classes in extends block with error
  */
 def extendsListBlockAnnotator(
-  isValidExtendsBlockMember : YAMLScalar => Boolean,
+  extendsBlockError : YAMLScalar => Option[String],
 ): CoolAnnotator[
   (
     YAMLScalar,
@@ -22,11 +22,12 @@ def extendsListBlockAnnotator(
   )
 ] =
   case ((element, _), annotationHolder) =>
-    if !isValidExtendsBlockMember(element) then
+    extendsBlockError(element).foreach(error =>
       annotationHolder
-        .newAnnotation(HighlightSeverity.ERROR, s"Couldn't find type ${element.getTextValue}")
+        .newAnnotation(HighlightSeverity.ERROR, error)
         .range(element)
         .create()
+    )
 end extendsListBlockAnnotator
 
 def isValidExtendsBlockMember(scalar: YAMLScalar) : Boolean =
