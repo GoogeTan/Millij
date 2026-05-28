@@ -57,5 +57,8 @@
             implementation="katze.millij.wizard.MillScalaNewProjectWizard" />
         <newProjectWizard.java.buildSystem
                 implementation="katze.millij.wizard.MillJavaNewProjectWizard" />
+
+        <codeInsight.linkHandler prefix="#goto/"
+                                 handlerClass="katze.millij.reference.ScTypeNavigationHandler"/>
     </extensions>
 </idea-plugin>

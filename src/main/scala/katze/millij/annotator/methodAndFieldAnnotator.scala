@@ -6,7 +6,6 @@ import com.intellij.psi.PsiElement
 import katze.millij.*
 import katze.millij.place.*
 import katze.millij.psi.*
-import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping}
 
 /**
@@ -21,7 +20,7 @@ def unexistingMembersAnnotator(
         error =>
           annotationHolder
             .newSilentAnnotation(
-              HighlightSeverity.ERROR,//TODO make references work
+              HighlightSeverity.ERROR,
             )
             .tooltip(error)
             .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
@@ -30,13 +29,6 @@ def unexistingMembersAnnotator(
       )
     end if
 end unexistingMembersAnnotator
-
-def scopeNameForUnexistingMembersAnnotator : PlaceInYamlConfig[ScType] => String =
-  case PlaceInYamlConfig.Module(extendList, definedMembers) =>
-    s"module which extends ${extendList.mkString(", ")}"
-  case PlaceInYamlConfig.Member(parentTypes, name, expectedType, definedMembers) =>
-    s"object of type <a href=$expectedType>$expectedType</a>"
-end scopeNameForUnexistingMembersAnnotator
 
 /**
  * Annotates keys of module declaration, object parameter declaration, module member declaration. 

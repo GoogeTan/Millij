@@ -57,7 +57,7 @@ def unexistingMembersError(mapping : YAMLMapping, kv : YAMLKeyValue) : Option[St
           s"object of type ${typeReference(expectedType)}</a>"
 
       Some(
-        s"<html><body>Couldn't find member with name '${kv.getKeyText}' to override in ${scopeText} </body>.</html>"
+        s"Couldn't find member with name '${kv.getKeyText}' to override in ${scopeText}"
       )
   )
 end unexistingMembersError
@@ -67,10 +67,15 @@ def typeReference(scType : ScType)(using TypePresentationContext) : String =
   val cleanFqn = scType.extractClass match
     case Some(psiClass) => psiClass.getQualifiedName
     case None => scType.canonicalText.takeWhile(_ != '[')
-  HtmlChunk.link(s"psi_element://$cleanFqn", scType.presentableText).toString
+  HtmlChunk.link(s"#goto/$cleanFqn", scType.presentableText).toString
 end typeReference
 
 //TODO rename me
+/**
+ * Calculates
+ * @param textRange
+ * @return
+ */
 def objectTextRanges(textRange : TextRange) : (TextRange, TextRange) =
   val objectText = "object"
   val objectKeywordRange = TextRange.create(textRange.getStartOffset, textRange.getStartOffset + objectText.length)
