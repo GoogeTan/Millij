@@ -4,8 +4,8 @@ import cats.Monad
 import cats.syntax.all.*
 import com.intellij.psi.PsiElement
 import com.intellij.psi.search.GlobalSearchScope
+import katze.millij.data.TypeSearchCache
 import katze.millij.psi.{CompletionPosition, YAMLChild, YAMLGrandChild}
-import katze.millij.scalatypes.classTypeSearch
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.yaml.psi.*
@@ -107,8 +107,9 @@ def richScopeOf(
   currentElement : YAMLPsiElement,
 ): Either[String, PlaceInYamlConfig[ScType]] =
   val project = currentElement.getProject
-  val search = (text :String) =>
-    Right(classTypeSearch(ScalaPsiManager.instance(project), GlobalSearchScope.allScope(project), text))
+  val search = (text : String) => 
+    Right(project.getService(classOf[TypeSearchCache]).search(text))
+    
   placeOf(
     currentElement,
     PlaceConfigResolver(search)
