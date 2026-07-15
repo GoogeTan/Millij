@@ -9,7 +9,7 @@
         available tasks tool window, and others.
     </description>
 
-    <resource-bundle>messages.MillBundle</resource-bundle>
+    <resource-bundle>messages.MillijBundle</resource-bundle>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.plugins.yaml</depends>
