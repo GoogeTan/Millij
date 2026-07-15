@@ -5,7 +5,6 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.util.ProcessingContext
 import com.intellij.util.text.VersionComparatorUtil
 import katze.millij.completions.cool.*
-import katze.millij.psi.YAMLMillModule
 import katze.millij.data.ScalaVersionCacheService
 import katze.millij.psi.*
 import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping, YAMLScalar}

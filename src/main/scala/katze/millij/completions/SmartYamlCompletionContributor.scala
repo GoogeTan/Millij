@@ -4,20 +4,19 @@ import com.intellij.codeInsight.completion.*
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.patterns.{PlatformPatterns, StandardPatterns}
 import com.intellij.psi.PsiElement
-import katze.millij.completions.cool.CoolCompletionContributor
+import katze.millij.completions.cool.{CoolCompletionContributor, DumbCoolCompletionContributor, SmartCoolCompletionContributor}
 import katze.millij.completions.providers.*
 import katze.millij.cool.{CoolPattern, PsiParentElementMatcher}
 import katze.millij.psi.CompletionPosition
 import org.jetbrains.yaml.YAMLLanguage
 import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLPsiElement, YAMLScalar, YAMLSequenceItem}
 
-//TODO split into dumb aware and not dumb aware versions
-final class YamlCompletionContributor extends CoolCompletionContributor:
-  val logger: Logger = Logger.getInstance(classOf[YamlCompletionContributor])
-
-  coolExtend(
-    CompletionType.BASIC,
-    extendsExistingKeyCompletionProvider,
+final class SmartYamlCompletionContributor extends SmartCoolCompletionContributor:
+  val logger: Logger = Logger.getInstance(classOf[SmartYamlCompletionContributor])
+  
+  coolExtendSmart(
+    CompletionType.SMART,
+    scalaExtendsValueCompletionProvider,
     _
       .withLanguage(YAMLLanguage.INSTANCE)
       .inVirtualFile(
@@ -27,9 +26,9 @@ final class YamlCompletionContributor extends CoolCompletionContributor:
       )
   )
 
-  coolExtend(
-    CompletionType.BASIC,
-    extendsNewKeyCompletionProvider,
+  coolExtendSmart(
+    CompletionType.SMART,
+    yamlExtendsValueCompletionProvider,
     _
       .withLanguage(YAMLLanguage.INSTANCE)
       .inVirtualFile(
@@ -39,9 +38,9 @@ final class YamlCompletionContributor extends CoolCompletionContributor:
       )
   )
 
-  coolExtend(
-    CompletionType.BASIC,
-    extendsValueCompletionProvider,
+  coolExtendSmart(
+    CompletionType.SMART,
+    scalaExtendsListCompletionProvider,
     _
       .withLanguage(YAMLLanguage.INSTANCE)
       .inVirtualFile(
@@ -51,9 +50,9 @@ final class YamlCompletionContributor extends CoolCompletionContributor:
       )
   )
 
-  coolExtend(
-    CompletionType.BASIC,
-    extendsListCompletionProvider,
+  coolExtendSmart(
+    CompletionType.SMART,
+    yamlExtendsListCompletionProvider,
     _
       .withLanguage(YAMLLanguage.INSTANCE)
       .inVirtualFile(
@@ -63,8 +62,8 @@ final class YamlCompletionContributor extends CoolCompletionContributor:
       )
   )
 
-  coolExtend(
-    CompletionType.BASIC,
+  coolExtendSmart(
+    CompletionType.SMART,
     memberCompletionProvider(logger),
     _
       .withLanguage(YAMLLanguage.INSTANCE)
@@ -75,20 +74,8 @@ final class YamlCompletionContributor extends CoolCompletionContributor:
       )
   )
 
-  coolExtend(
-    CompletionType.BASIC,
-    scalaVersionCompletionProvider,
-    _
-      .withLanguage(YAMLLanguage.INSTANCE)
-      .inVirtualFile(
-        PlatformPatterns.virtualFile().withName(
-          StandardPatterns.string().endsWith(".mill.yaml")
-        )
-      ),
-  )
-
-  patternExtend(
-    CompletionType.BASIC,
+  patternExtendSmart(
+    CompletionType.SMART,
     CoolPattern.elementAndParent[CompletionPosition, YAMLPsiElement]() :* yamlMavenDependenciesPattern,
     _
       .withLanguage(YAMLLanguage.INSTANCE)
@@ -101,4 +88,4 @@ final class YamlCompletionContributor extends CoolCompletionContributor:
     case ((_, parent, text), ctx, resultSet) =>
       suggestMavenDependency(parent, text, resultSet)
   }
-end YamlCompletionContributor
+end SmartYamlCompletionContributor

@@ -4,12 +4,11 @@ import com.intellij.codeInsight.completion.*
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
 import katze.millij.*
-import katze.millij.place.*
 import katze.millij.completions.cool.CoolCompletionProvider
 import katze.millij.cool.CoolPattern
-import katze.millij.data.MavenDependencyShared
-import katze.millij.psi.PsiChild
-import katze.millij.psi.CompletionPosition
+import katze.millij.data.{MavenDependencyShared, Smart}
+import katze.millij.place.*
+import katze.millij.psi.{CompletionPosition, PsiChild}
 import org.jetbrains.yaml.psi.*
 
 /**
@@ -53,9 +52,9 @@ end cleanElementTextFromDummyIdentifier
  * @param resultSet
  * @see [[ScalaMavenDependenciesCompletionProvider]] for scala conterpart
  */
-def suggestMavenDependency(element: YAMLPsiElement, dependencyText: String, resultSet: CompletionResultSet): Unit =
-  richScopeOf(element).foreach:
-    case PlaceInYamlConfig.Member(_, _, expectedType, _) if expectedType.canonicalText.endsWith("Dep") =>//TODO unhardcode me
+def suggestMavenDependency(element: YAMLPsiElement, dependencyText: String, resultSet: CompletionResultSet)(using Smart): Unit =
+  richPlaceOf(element).foreach:
+    case PlaceInYamlConfig.Member(_, expectedType, _) if expectedType.canonicalText.endsWith("Dep") =>//TODO unhardcode me
       MavenDependencyShared.searchAndSuggestDependencies(resultSet, "3.0.0", element.getProject, dependencyText)
     case _ =>
 end suggestMavenDependency

@@ -1,5 +1,6 @@
 package katze.millij.scalatypes
 
+import katze.millij.data.Smart
 import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue, ScVariable}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScTemplateDefinition}
@@ -7,8 +8,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScTem
 /**
  * Returns all the members which have zero parameters: methods without parameters, vars, vals and primary contractor arguments.
  * Basically those are all things that can be defined in YAML config.
+ * TODO refactor to use signatures 
  */
-def yamlDefinableMembersOf(template: ScTemplateDefinition): Seq[ScTypedDefinition] =
+def yamlDefinableMembersOf(template: ScTemplateDefinition)(using Smart): Seq[ScTypedDefinition] =
   val ignoredBaseClasses = Set(
     "java.lang.Object",
     "scala.Any",

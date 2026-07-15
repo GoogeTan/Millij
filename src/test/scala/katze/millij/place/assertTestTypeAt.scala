@@ -1,17 +1,23 @@
-package katze.millij
+package katze.millij.place
 
 import cats.syntax.all.*
 import com.intellij.testFramework.UsefulTestCase.assertInstanceOf
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture
 import katze.millij.psi.CompletionPosition
+import katze.millij.*
 import org.jetbrains.yaml.psi.{YAMLFile, YAMLPsiElement}
 import org.junit.Assert.assertEquals
 
-def assertAutocomplete(myFixture : CodeInsightTestFixture, text : String, expectedElement : Either[String, TestType]) : Unit =
+/**
+ * Asserts that text type under cursor is equals to the expected one
+ * @param text document text with a caret present
+ * @param expectedElement expected test type at caret position
+ */
+def assertTestTypeAt(myFixture : CodeInsightTestFixture, text : String, expectedElement : Either[String, TestPlace]) : Unit =
   val psiFile = myFixture.configureByText("build.mill.yaml", text)
   val yamlFile = assertInstanceOf(psiFile, classOf[YAMLFile])
   val offset = myFixture.getCaretOffset
-
+  
   var elementAtCaret = psiFile.findElementAt(offset)
 
   // Caret Boundary Check:
@@ -22,8 +28,6 @@ def assertAutocomplete(myFixture : CodeInsightTestFixture, text : String, expect
   end if
 
   val caretElement : CompletionPosition = assertMatches(elementAtCaret, CompletionPosition.unapply)
-  val scope = testScopeOf(caretElement).leftMap(_.mkString_("\n"))
+  val scope = testPlaceOf(caretElement).leftMap(_.mkString_("\n"))
   assertEquals(expectedElement, scope)
-end assertAutocomplete
-
-
+end assertTestTypeAt

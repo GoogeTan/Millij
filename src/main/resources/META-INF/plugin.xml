@@ -15,7 +15,8 @@
     <depends>org.jetbrains.plugins.yaml</depends>
     <depends>org.intellij.scala</depends>
     <depends>com.intellij.modules.java</depends>
-    <depends>org.jetbrains.idea.maven</depends>
+
+    <depends optional="true" config-file="mill-maven.xml">org.jetbrains.idea.maven</depends>
     <depends optional="true" config-file="mill-kotlin-features.xml">org.jetbrains.kotlin</depends>
 
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
@@ -23,9 +24,11 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
+        <psi.elementFinder implementation="katze.millij.elementfinder.YamlObjectFinder"/>
         <configurationType implementation="katze.millij.configuration.MillRunConfigurationType"/>
         <postStartupActivity implementation="katze.millij.MillProjectStartupActivity"/>
-        <completion.contributor language="yaml" implementationClass="katze.millij.completions.YamlCompletionContributor"/>
+        <completion.contributor language="yaml" implementationClass="katze.millij.completions.SmartYamlCompletionContributor"/>
+        <completion.contributor language="yaml" implementationClass="katze.millij.completions.DumbYamlCompletionContributor"/>
         <completion.contributor language="Scala 3" order="first" implementationClass="katze.millij.completions.ScalaCompletionProvider"/>
         <completion.confidence
                 order="first"
@@ -35,7 +38,10 @@
         
         <annotator
                 language="yaml"
-                implementationClass="katze.millij.annotator.MillYamlAnnotator" />
+                implementationClass="katze.millij.annotator.DumbMillYamlAnnotator" />
+        <annotator
+                language="yaml"
+                implementationClass="katze.millij.annotator.SmartMillYamlAnnotators" />
 
         <codeInsight.declarativeInlayProvider
                 implementationClass="katze.millij.inlay.MillYamlInlayHintsProvider"
@@ -60,5 +66,11 @@
 
         <codeInsight.linkHandler prefix="#goto/"
                                  handlerClass="katze.millij.reference.ScTypeNavigationHandler"/>
+
+        <fileBasedIndex implementation="katze.millij.data.module.YamlModuleIndex"/>
+        <editorNotificationProvider
+                implementation="katze.millij.BspImportNotificationProvider"/>
+        <notificationGroup id="Mill BSP Notifications" displayType="BALLOON" />
+
     </extensions>
 </idea-plugin>

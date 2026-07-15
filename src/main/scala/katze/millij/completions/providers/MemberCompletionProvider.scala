@@ -7,8 +7,9 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.util.ProcessingContext
 import katze.millij.completions.cool.CoolCompletionProvider
+import katze.millij.data.Smart
+import katze.millij.place.{richPlaceOf, yamlDefinableMembersOfScope}
 import katze.millij.psi.CompletionPosition
-import katze.millij.place.{yamlDefinableMembersOfScope, richScopeOf}
 import katze.millij.scalatypes.unwrapMillTask
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil.inNameContext
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
@@ -19,7 +20,7 @@ import org.jetbrains.yaml.psi.YAMLPsiElement
 /**
  * Adds completions for module members and object params.
  */
-def memberCompletionProvider(logger : Logger) : CoolCompletionProvider[CompletionPosition, YAMLPsiElement] =
+def memberCompletionProvider(logger : Logger)(using Smart) : CoolCompletionProvider[CompletionPosition, YAMLPsiElement] =
   case (
     parameters: CompletionParameters,
     psiElement: CompletionPosition,
@@ -27,7 +28,7 @@ def memberCompletionProvider(logger : Logger) : CoolCompletionProvider[Completio
     context: ProcessingContext,
     resultSet: CompletionResultSet
   ) =>
-    richScopeOf(yamlElement) match
+    richPlaceOf(yamlElement) match
       case Left(errValue) =>
         logger.debug(s"Couldn't build completions for $psiElement of class ${psiElement.getClass.getSimpleName}:\n ${errValue}")
       case Right(scope) =>
@@ -38,7 +39,7 @@ def memberCompletionProvider(logger : Logger) : CoolCompletionProvider[Completio
     end match
 end memberCompletionProvider
 
-def makeLookupElementForTypedDefinition(definition : ScTypedDefinition, logger : Logger) : LookupElement =
+def makeLookupElementForTypedDefinition(definition : ScTypedDefinition, logger : Logger)(using Smart) : LookupElement =
   val name = definition.name
   val typeName = definitionTypeString(definition, logger)
 
@@ -48,7 +49,7 @@ def makeLookupElementForTypedDefinition(definition : ScTypedDefinition, logger :
     .withIcon(AllIcons.Nodes.Property)
 end makeLookupElementForTypedDefinition
 
-def definitionTypeString(definition : ScTypedDefinition, logger : Logger) : String =
+def definitionTypeString(definition : ScTypedDefinition, logger : Logger)(using Smart) : String =
   definition
     .`type`()
     .map(unwrapMillTask)

@@ -1,6 +1,6 @@
 # Millij
 
-This project adds IDE features specific to [mill build tool](https://github.com/com-lihaoyi/mill).
+This project adds IDE features specific to [mill build tool](https://github.com/com-lihaoyi/mill) including but not limited to YAML configs.
 
 ![Build](https://github.com/GoogeTan/mill-project-templates/workflows/Build/badge.svg)
 [![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)

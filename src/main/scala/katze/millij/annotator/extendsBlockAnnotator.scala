@@ -1,10 +1,9 @@
 package katze.millij.annotator
 
 import com.intellij.lang.annotation.HighlightSeverity
-import com.intellij.psi.search.GlobalSearchScope
-import katze.millij.data.TypeSearchCache
+import katze.millij.data.*
+import katze.millij.data.module.*
 import katze.millij.psi.YAMLKeyValueWithKey
-import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.yaml.psi.{YAMLScalar, YAMLSequence, YAMLSequenceItem}
 
 /**
@@ -30,7 +29,12 @@ def extendsListBlockAnnotator(
     )
 end extendsListBlockAnnotator
 
-def isValidExtendsBlockMember(scalar: YAMLScalar) : Boolean =
+def isValidExtendsBlockMember(context: NamespacedPath[List, ScalaIdentifier], scalar: YAMLScalar)(using Smart) : Boolean =
   val project = scalar.getProject
-  project.getService(classOf[TypeSearchCache]).searchSkType(scalar.getTextValue).isDefined
+  val searchService = project.getService(classOf[MillModuleService])
+  SegmentedPath
+    .fromQualifiedNonEmpty(scalar.getTextValue)
+    .flatMap(_.traverse(ScalaIdentifier.fromStringOption))
+    .flatMap(searchService.resolvePath(context, _).completelyResolvedTarget)
+    .isDefined
 end isValidExtendsBlockMember

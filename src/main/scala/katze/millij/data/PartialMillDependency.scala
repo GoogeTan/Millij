@@ -1,7 +1,5 @@
 package katze.millij.data
 
-import katze.millij.{PartialMillDependency, PlatformVersion, ScalaVersioning}
-
 enum ScalaVersioning:
   case Java        // 1 colon (:)
   case ScalaBinary // 2 colons (::)

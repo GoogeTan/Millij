@@ -2,8 +2,8 @@ package katze.millij.wizard
 
 import com.intellij.ide.wizard.{AbstractNewProjectWizardStep, NewProjectWizardStep}
 import com.intellij.openapi.project.Project
-import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.components.JBTextField
+import com.intellij.ui.dsl.builder.Panel
 import org.jetbrains.sbt.project.template.wizard.ScalaNewProjectWizardMultiStep
 
 import java.nio.file.Files
@@ -62,7 +62,7 @@ final class MillNewProjectWizardStep(
     else if buildMillRadio.isSelected then
       "build.mill"
     else
-      "build.yaml"
+      "build.mill.yaml"
     generateMillBuildFile(projectDir, configFilename)
   end setupProject
 

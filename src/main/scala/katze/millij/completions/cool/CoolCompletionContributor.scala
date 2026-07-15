@@ -2,10 +2,12 @@ package katze.millij.completions.cool
 
 import com.intellij.codeInsight.completion.*
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.project.DumbAware
 import com.intellij.patterns.{ElementPattern, PlatformPatterns, PsiElementPattern}
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
 import katze.millij.cool.{CoolPattern, PsiElementMatcher, PsiParentElementMatcher}
+import katze.millij.data.Smart
 
 import scala.reflect.ClassTag
 
@@ -70,3 +72,41 @@ trait CoolCompletionContributor extends CompletionContributor:
         end addCompletions
     )
 end CoolCompletionContributor
+
+abstract class DumbCoolCompletionContributor extends CoolCompletionContributor with DumbAware
+
+abstract class SmartCoolCompletionContributor extends CoolCompletionContributor:
+  def coolExtendSmart[
+    Element <: PsiElement : PsiElementMatcher as pem,
+    Parents: PsiParentElementMatcher as psiParents
+  ](
+    `type`: CompletionType,
+    provider: Smart ?=> CoolCompletionProvider[Element, Parents],
+    place: PsiElementPattern.Capture[Element] => ElementPattern[? <: PsiElement]
+  ): Unit =
+    coolExtend[Element, Parents](
+      `type`,
+      (completionParameters, element, parents, processingContext, resultSet) =>
+        Smart(element.getProject) {
+          provider(completionParameters, element, parents, processingContext, resultSet)
+        },
+      place
+    )
+  end coolExtendSmart
+
+  def patternExtendSmart[
+    Data
+  ](
+    completionType: CompletionType,
+    pattern: CoolPattern[Data],
+    place: PsiElementPattern.Capture[? <: PsiElement] => ElementPattern[? <: PsiElement]
+  )(
+    completionProvider: Smart ?=> (Data, ProcessingContext, CompletionResultSet) => Unit
+  ): Unit =
+    patternExtend(completionType, pattern && CoolPattern.element[PsiElement], place):
+      case ((data, element), context, result) =>
+        Smart(element.getProject) {
+          completionProvider(data, context, result)
+        }
+  end patternExtendSmart
+end SmartCoolCompletionContributor

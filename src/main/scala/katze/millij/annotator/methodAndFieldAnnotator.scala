@@ -1,9 +1,11 @@
 package katze.millij.annotator
 
 import com.intellij.codeInspection.ProblemHighlightType
-import com.intellij.lang.annotation.HighlightSeverity
+import com.intellij.lang.annotation.{AnnotationHolder, HighlightSeverity}
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import katze.millij.*
+import katze.millij.data.Smart
 import katze.millij.place.*
 import katze.millij.psi.*
 import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping}
@@ -15,7 +17,7 @@ def unexistingMembersAnnotator(
   checkIfItIsACorrectMember : (YAMLMapping, YAMLKeyValue) => Option[String]
 ) : CoolAnnotator[(YAMLKey[PsiElement], YAMLKeyValue, YAMLMapping)] =
   case ((element, keyValue, mapping), annotationHolder) =>
-    if !isObjectDeclarationText(keyValue.getKeyText) && !isExtendsBlock(keyValue.getKeyText) then
+    if isMemberName(keyValue.getKeyText) then
       checkIfItIsACorrectMember(mapping, keyValue).foreach(
         error =>
           annotationHolder
@@ -32,39 +34,60 @@ end unexistingMembersAnnotator
 
 /**
  * Annotates keys of module declaration, object parameter declaration, module member declaration. 
+ * TODO make it work in dumb mode. It wants to know only type of scope without any details about types. It must be safe to do that. 
  */
-def methodAndFieldAnnotator : CoolAnnotator[(YAMLKeyValueWithNotKey["extends"], YAMLMapping)] =
+def methodAndFieldAnnotator(scopeOf : YAMLKeyValueWithNotKey["extends"] => Option[Boolean]) : CoolAnnotator[(YAMLKeyValueWithNotKey["extends"], YAMLMapping)] =
   case ((kv, mapping), annotationHolder) =>
-    richScopeOf(kv).foreach:
-      case PlaceInYamlConfig.Module(extendList, _) =>
+    scopeOf(kv) match
+      case Some(true) =>
         if isObjectDeclarationText(kv.getKeyText) then
-          val (objectKeywordRange, nameRange) = objectTextRanges(kv.getKey.getTextRange)
-
-          annotationHolder
-            .newSilentAnnotation(HighlightSeverity.INFORMATION)
-            .textAttributes(MillTextStyles.OBJECT_KEYWORD)
-            .range(objectKeywordRange)
-            .create()
-
-          annotationHolder
-            .newSilentAnnotation(HighlightSeverity.INFORMATION)
-            .textAttributes(MillTextStyles.OBJECT_NAME)
-            .range(nameRange)
-            .create()
-
-        else if !isExtendsBlock(kv.getKeyText) then
-          annotationHolder
-            .newSilentAnnotation(HighlightSeverity.INFORMATION)
-            .range(kv.getKey)
-            .textAttributes(MillTextStyles.FUNCTION_DECLARATION)
-            .create()
+          annotateObjectKeyValue(kv, annotationHolder)
+        else
+          annotateModuleMemeber(kv, annotationHolder)
         end if
-
-      case PlaceInYamlConfig.Member(parentTypes, name, expectedType, _) =>
+      case Some(false) =>
         annotationHolder
           .newSilentAnnotation(HighlightSeverity.INFORMATION)
           .range(kv.getKey)
-          .textAttributes(MillTextStyles.OVERRIDE_RHS)
+          .textAttributes(MillijTextStyles.MILL_YAML_NAMED_ARGUMENT)
           .create()
+      case None =>
 end methodAndFieldAnnotator
 
+def annotateObjectKeyValue(keyValue: YAMLKeyValue, annotationHolder: AnnotationHolder) : Unit =
+  val (objectKeywordRange, nameRange) = objectTextRanges(keyValue.getKey.getTextRange)
+
+  annotationHolder
+    .newSilentAnnotation(HighlightSeverity.INFORMATION)
+    .textAttributes(MillijTextStyles.OBJECT_KEYWORD)
+    .range(objectKeywordRange)
+    .create()
+
+  annotationHolder
+    .newSilentAnnotation(HighlightSeverity.INFORMATION)
+    .textAttributes(MillijTextStyles.MILL_YAML_MODULE_NAME)
+    .range(nameRange)
+    .create()
+end annotateObjectKeyValue
+
+def annotateModuleMemeber(keyValue: YAMLKeyValue, annotationHolder: AnnotationHolder) : Unit =
+  annotationHolder
+    .newSilentAnnotation(HighlightSeverity.INFORMATION)
+    .range(keyValue.getKey)
+    .textAttributes(MillijTextStyles.MILL_YAML_MODULE_MEMBER)
+    .create()
+end annotateModuleMemeber
+  
+
+//TODO rename me
+/**
+ * Calculates text ranges that indicate object keyword and module name in module declaration
+ * 
+ * Note that it assumes that text range is actually a module declaration so results for any other text is meaningless.
+ */
+def objectTextRanges(textRange : TextRange) : (TextRange, TextRange) =
+  val objectText = "object"
+  val objectKeywordRange = TextRange.create(textRange.getStartOffset, textRange.getStartOffset + objectText.length)
+  val nameRange = TextRange.create(textRange.getStartOffset + objectText.length, textRange.getEndOffset)
+  (objectKeywordRange, nameRange)
+end objectTextRanges

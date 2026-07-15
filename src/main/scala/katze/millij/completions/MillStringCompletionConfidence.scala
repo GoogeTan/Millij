@@ -17,10 +17,8 @@ class MillStringCompletionConfidence extends CompletionConfidence:
     handleConfidence(contextElement, psiFile)
 
   private def handleConfidence(contextElement: PsiElement, psiFile: PsiFile): ThreeState =//TODO remove logs
-    println("1")
     if !psiFile.getName.endsWith(".mill") && !psiFile.getName.endsWith(".sc") then
       return ThreeState.UNSURE
-    println("2")
     contextElement.getParent match
       case stringLiteral: ScInterpolatedStringLiteral if isMavenDependencyInterpolatedStringLiteral(stringLiteral) =>
         ThreeState.NO

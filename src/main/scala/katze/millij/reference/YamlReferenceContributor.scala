@@ -2,10 +2,10 @@ package katze.millij.reference
 
 import com.intellij.patterns.{PlatformPatterns, StandardPatterns}
 import com.intellij.psi.*
-import org.jetbrains.yaml.psi.*
-import katze.millij.reference.cool.registerCoolReferenceProvider
 import katze.millij.*
 import katze.millij.place.*
+import katze.millij.reference.cool.registerCoolReferenceProvider
+import org.jetbrains.yaml.psi.*
 
 class YamlReferenceContributor extends PsiReferenceContributor:
   override def registerReferenceProviders(registrar: PsiReferenceRegistrar): Unit =

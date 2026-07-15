@@ -1,6 +1,7 @@
 package katze.millij.annotator
 
 import com.intellij.lang.annotation.HighlightSeverity
+import katze.millij.data.MillijBundle
 import katze.millij.place.isObjectDeclarationText
 import katze.millij.psi.PsiChild
 import org.jetbrains.yaml.psi.{YAMLDocument, YAMLKeyValue, YAMLMapping}
@@ -25,8 +26,7 @@ def objectInInappropriatePlace : CoolAnnotator[(YAMLKeyValue, YAMLMapping)] =
       annotationHolder
         .newSilentAnnotation(HighlightSeverity.ERROR)
         .range(kv)
-        .tooltip("Module declaration is not allowed inside of object instantiation")
+        .tooltip(MillijBundle.message("module.declaration.inappropriate.place.error"))
         .create()
     end if
 end objectInInappropriatePlace
-

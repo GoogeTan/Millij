@@ -17,7 +17,7 @@ class ScalaMillLanguageConfigurator extends MillLanguageConfigurator:
 
   override def generateConfig(isYaml: Boolean): String =
     if isYaml then
-      s"""# build.yaml
+      s"""
          |extends: ScalaModule
          |scalaVersion: ${scalaVersion.getText}
          |""".stripMargin

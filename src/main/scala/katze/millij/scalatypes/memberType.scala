@@ -1,5 +1,6 @@
 package katze.millij.scalatypes
 
+import katze.millij.data.Smart
 import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue, ScVariable}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScClass
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
@@ -8,9 +9,9 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
  * Searches the base ScType for a method with 0 arguments, a field matching the name,
  * or a primary constructor parameter and returns it's type.
  */
-def findMemberType(baseType: ScType, fieldName: String): Option[ScType] =
+def findMemberType(baseType: ScType, fieldName: String)(using Smart): Option[ScType] =
   extractTemplateDefinition(baseType).flatMap { template =>
-    val directMatch = template.members.iterator.collectFirst {
+    val directMatch = template.members.collectFirst {
       case fn: ScFunction if fn.parameters.isEmpty && fn.name == fieldName =>
         fn.returnType.toOption
 

@@ -4,34 +4,42 @@ import com.intellij.codeInsight.hints.declarative.*
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.{PsiElement, PsiFile}
-import katze.millij.data.TypeSearchCache
-import katze.millij.place.{PlaceConfigResolver, PlaceInYamlConfig, YAMLConfigResolver, isExtendsBlock, isObjectDeclarationText, richScopeOf}
-import katze.millij.psi.{YAMLKey, YAMLKeyValueWithNotKey}
-import katze.millij.psi.{YAMLChild, YAMLGrandChild}
+import katze.millij.data.*
+import katze.millij.data.module.NamespacedPath
+import katze.millij.file.*
+import katze.millij.place.*
+import katze.millij.psi.{YAMLChild, YAMLGrandChild, YAMLKey, YAMLKeyValueWithNotKey}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
-import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping, YAMLScalar}
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
+import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping, YAMLScalar}
 
 /**
  * Adds type inlay hints for members.
  */
 final class MillYamlInlayHintsProvider extends InlayHintsProvider:
-  override def createCollector(psiFile: PsiFile, editor: Editor): InlayHintsCollector =
+  override def createCollector(psiFile: PsiFile, editor: Editor): InlayHintsCollector | Null =
     val project = psiFile.getProject
-    val search = project.getService(classOf[TypeSearchCache]).searchSkType(_)
-    Collector(PlaceConfigResolver.option(search))
+    Smart(project) {
+      psiFile.getVirtualFile
+        .relativePathToContentRoot(project)
+        .map(SegmentedPath.fromPath)
+        .flatMap(_.traverse(ScalaIdentifier.fromStringOption))
+        .map(rootPath =>
+          Collector(richPlaceConfigResolverOption(project, rootPath))
+        ).orNull
+    }.orNull
   end createCollector
 
   class Collector(
     resolver : YAMLConfigResolver[Option, PlaceInYamlConfig[ScType]]
-  ) extends SharedBypassCollector:
+  )(using Smart) extends SharedBypassCollector:
     override def collectFromElement(
       psiElement: PsiElement,
       inlayTreeSink: InlayTreeSink
     ): Unit =
       extractElement(psiElement).flatMap(innerScopeOf).getOrElse(return) match
-        case PlaceInYamlConfig.Module(_, _) =>
-        case PlaceInYamlConfig.Member(_, _, expectedType, _) =>
+        case PlaceInYamlConfig.Module(_, _, _) =>
+        case PlaceInYamlConfig.Member(_, expectedType, _) =>
           inlayTreeSink.addPresentation(
             InlineInlayPosition(psiElement.getTextRange.getEndOffset, true, 0),
             null,
@@ -42,7 +50,7 @@ final class MillYamlInlayHintsProvider extends InlayHintsProvider:
               HintMarginPadding.OnlyPadding
             ),
             builder =>
-              builder.text(s": ${expectedType}", null)
+              builder.text(s": $expectedType", null)
               kotlin.Unit.INSTANCE
           )
     end collectFromElement
@@ -82,11 +90,11 @@ final class MillYamlInlayHintsProvider extends InlayHintsProvider:
      * For `unfinishedKeypairThatIsParsedAsScalar` and `someKeyValueExample` it will return [[PlaceInYamlConfig.Module]] of SomeModule.
      * For `nestedKeyValue` and `nestedUnfinishedKeyValueThatIsParsedAsScalar` it will return [[PlaceInYamlConfig.Member]] of [[PlaceInYamlConfig.Module]] of SomeModule.
      */
-    def enclosingScope : YAMLScalar | YAMLKeyValue => Option[(String, PlaceInYamlConfig[ScType])] =
+    def enclosingScope(using Smart) : YAMLScalar | YAMLKeyValue => Option[(String, PlaceInYamlConfig[ScType])] =
       case scalar: YAMLScalar =>
-        richScopeOf(scalar).toOption.map((scalar.getTextValue, _))
+        richPlaceOf(scalar).toOption.map((scalar.getTextValue, _))
       case kv: YAMLKeyValue =>
-        richScopeOf(kv).toOption.map((kv.getKeyText, _))
+        richPlaceOf(kv).toOption.map((kv.getKeyText, _))
       case _ =>
         None
     end enclosingScope
@@ -102,7 +110,7 @@ final class MillYamlInlayHintsProvider extends InlayHintsProvider:
      * For all `unfinishedKeypairThatIsParsedAsScalar`, `someKeyValueExample`, `someKeyValueExampleWithoutBody`
      * it will return scope of member with corresponding name in SomeModule.
      */
-    def innerScopeOf(element : YAMLScalar | YAMLKeyValue) : Option[PlaceInYamlConfig[ScType]] =
+    def innerScopeOf(element : YAMLScalar | YAMLKeyValue)(using Smart) : Option[PlaceInYamlConfig[ScType]] =
       enclosingScope(element).flatMap((fieldName, parentScope) =>
         resolver.field(parentScope, fieldName)
       )

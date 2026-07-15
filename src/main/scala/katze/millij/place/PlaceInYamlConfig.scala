@@ -2,16 +2,14 @@ package katze.millij.place
 
 import cats.Applicative
 import cats.syntax.all.*
-import com.intellij.psi.{PsiClass, PsiElement}
-import katze.millij.scalatypes.{extractTemplateDefinition, findMemberType, unwrapMillTask, unwrapSeq, yamlDefinableMembersOf}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue, ScValueOrVariable, ScVariable}
+import katze.millij.data.module.NamespacedPath
+import katze.millij.data.{ScalaIdentifier, Smart}
+import katze.millij.scalatypes.*
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScMember, ScTemplateDefinition}
-import org.jetbrains.plugins.scala.lang.psi.types.api.ParameterizedType
-import org.jetbrains.plugins.scala.lang.psi.types.{BaseTypes, ScType, ScTypeExt}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
+import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.yaml.psi.*
 
-import scala.annotation.tailrec
 import scala.jdk.CollectionConverters.*
 
 /**
@@ -20,15 +18,24 @@ import scala.jdk.CollectionConverters.*
 enum PlaceInYamlConfig[Type](val definedMembers : List[String]):
   case Module(
     extendList: List[Type],
-    override val definedMembers : List[String]
+    inFilePath : NamespacedPath[List, ScalaIdentifier],
+    override val definedMembers : List[String],
   ) extends PlaceInYamlConfig[Type](definedMembers)
   
   case Member(
-    parentTypes : List[Type], 
     name : String, 
     expectedType: Type, 
     override val definedMembers : List[String]
   ) extends PlaceInYamlConfig[Type](definedMembers)
+
+  override def toString: String =
+    this match
+      case PlaceInYamlConfig.Module(extendList, inFilePath, definedMembers) =>
+        s"PlaceInYamlConfig.Module(name=${inFilePath.asQualified}, extends=[${extendList.mkString(", ")}], defined members=[${definedMembers.mkString(", ")}])"
+      case PlaceInYamlConfig.Member(name, expectedType, definedMembers) =>
+        s"PlaceInYamlConfig.Member(name=$name, expectedType=$expectedType, defined members=[${definedMembers.mkString(", ")}])"
+    end match
+  end toString
 end PlaceInYamlConfig
 
 /**
@@ -36,52 +43,48 @@ end PlaceInYamlConfig
  * which means that user has tried to write a module inside a member) then it returns `ifCalledOnMemberScope`
  */
 def nestedModulePlaceFromYamlMapping[F[_] : Applicative, Type](
+  name : ScalaIdentifier,
   parentPlace: PlaceInYamlConfig[Type],
   moduleBody: YAMLMapping,
-  classSource : String => F[Option[Type]],
+  resolveParent : (NamespacedPath[List, ScalaIdentifier], String) => F[Option[Type]],
   ifCalledOnMemberScope : PlaceInYamlConfig.Member[Type] => F[PlaceInYamlConfig[Type]]
 ) : F[PlaceInYamlConfig[Type]] =
   parentPlace match
-    case PlaceInYamlConfig.Module(_, _) =>
-      modulePlaceOfYamlMapping(moduleBody, classSource)
+    case PlaceInYamlConfig.Module(_, inFilePath, _) =>
+      modulePlaceOfYamlMapping(inFilePath.addPathSegment(name), moduleBody, resolveParent(inFilePath, _))
     case rhs : PlaceInYamlConfig.Member[Type] =>
       ifCalledOnMemberScope(rhs)
 end nestedModulePlaceFromYamlMapping
 
 //TODO Rename me
 def modulePlaceOfYamlMapping[F[_] : Applicative, Type](
+  path: NamespacedPath[List, ScalaIdentifier],
   mapping: YAMLMapping,
-  classSource : String => F[Option[Type]]
+  resolveParent : String => F[Option[Type]]
 ) : F[PlaceInYamlConfig[Type]] =
   getExtendsContentsOf(mapping).getOrElse(Nil)
-    .traverse(classSource)
+    .traverse(resolveParent)
     .map(_.flatten)
-    .map(PlaceInYamlConfig.Module(_, mapping.getKeyValues.asScala.map(_.getKeyText).toList))
+    .map(PlaceInYamlConfig.Module(_, path, mapping.getKeyValues.asScala.map(_.getKeyText).toList))
 end modulePlaceOfYamlMapping
 
 /**
  * Returns all the classes/traits mentioned in extends.
  */
 def getExtendsContentsOf(mapping : YAMLMapping) : Option[List[String]] =
-  val extendsBlocks = 
-    mapping.getKeyValues.asScala.toList
+  Option(mapping.getKeyValueByKey("extends"))
       .map(kv => (kv, kv.getValue))
       .collect:
-        case (kv, value : YAMLScalar) if isExtendsBlock(kv.getKeyText) =>
+        case (kv, value : YAMLScalar) =>
           List(value)
-        case (kv, value : YAMLSequence) if isExtendsBlock(kv.getKeyText) =>
+        case (kv, value : YAMLSequence) =>
           value.getItems.asScala.toList
             .map(_.getValue)
             .collect:
               case element : YAMLScalar => element
-  
-  if extendsBlocks.length > 1 then
-    //TODO log warning down
-    ()
-  end if
-  extendsBlocks.headOption.map(
-    _.map(_.getTextValue)
-  )
+      .map(
+        _.map(_.getTextValue)
+      )
 end getExtendsContentsOf
 
 /**
@@ -93,13 +96,13 @@ def sequenceElementPlace[F[_] : Applicative](
   scope : PlaceInYamlConfig[ScType],
   onObjectDefinition : => F[PlaceInYamlConfig[ScType]],
   onNotSeq : => F[PlaceInYamlConfig[ScType]]
-) : F[PlaceInYamlConfig[ScType]] =
+)(using Smart) : F[PlaceInYamlConfig[ScType]] =
   scope match
-    case PlaceInYamlConfig.Module(_, _) =>
+    case PlaceInYamlConfig.Module(_, _, _) =>
       onObjectDefinition
-    case PlaceInYamlConfig.Member(parentTypes, name, expectedType, _) =>
+    case PlaceInYamlConfig.Member(name, expectedType, _) =>
       unwrapSeq(expectedType)
-        .map(PlaceInYamlConfig.Member(parentTypes, name, _, Nil))
+        .map(PlaceInYamlConfig.Member(name, _, Nil))
         .map(_.pure)
         .getOrElse(onNotSeq)
   end match
@@ -108,7 +111,7 @@ end sequenceElementPlace
 /**
  * Attempts to build a place of a member. It returns [[None]] only if there is no member with given name.
  */
-def memberPlace(scope: PlaceInYamlConfig[ScType], membersName: String): Option[PlaceInYamlConfig[ScType]] =
+def memberPlace(scope: PlaceInYamlConfig[ScType], membersName: String)(using Smart): Option[PlaceInYamlConfig[ScType]] =
   def resolveMemberType(baseTypes: List[ScType]): Option[ScType] =
     baseTypes.iterator
       .flatMap(findMemberType(_, membersName))
@@ -116,25 +119,25 @@ def memberPlace(scope: PlaceInYamlConfig[ScType], membersName: String): Option[P
       .map(unwrapMillTask)
 
   scope match
-    case PlaceInYamlConfig.Module(extendList, _) =>
+    case PlaceInYamlConfig.Module(extendList, _, _) =>
       resolveMemberType(extendList).map(
-        PlaceInYamlConfig.Member(extendList, membersName, _, Nil)
+        PlaceInYamlConfig.Member(membersName, _, Nil)
       )
-    case PlaceInYamlConfig.Member(_, _, expectedType, _) =>
+    case PlaceInYamlConfig.Member(_, expectedType, _) =>
       resolveMemberType(List(expectedType)).map(
-        PlaceInYamlConfig.Member(List(expectedType), membersName, _, Nil)
+        PlaceInYamlConfig.Member(membersName, _, Nil)
       )
 end memberPlace
 
 /**
  * Returns all the members suitable for being defined in a YAML config.
  */
-def yamlDefinableMembersOfScope : PlaceInYamlConfig[ScType] => List[ScTypedDefinition] =
-  case PlaceInYamlConfig.Module(extendList, _) =>
+def yamlDefinableMembersOfScope(using Smart) : PlaceInYamlConfig[ScType] => List[ScTypedDefinition] =
+  case PlaceInYamlConfig.Module(extendList, _, _) =>
     extendList
       .flatMap(extractTemplateDefinition)
       .flatMap(yamlDefinableMembersOf)
-  case PlaceInYamlConfig.Member(_, _, expectedType, _) =>
+  case PlaceInYamlConfig.Member(_, expectedType, _) =>
     extractTemplateDefinition(expectedType)
       .toList
       .flatMap(yamlDefinableMembersOf)

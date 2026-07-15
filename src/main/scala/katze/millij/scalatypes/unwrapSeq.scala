@@ -1,13 +1,13 @@
 package katze.millij.scalatypes
 
-import org.jetbrains.plugins.scala.lang.psi.types.{BaseTypes, ScType}
+import katze.millij.data.Smart
 import org.jetbrains.plugins.scala.lang.psi.types.api.ParameterizedType
-import org.jetbrains.plugins.scala.lang.psi.types.ScTypeExt
+import org.jetbrains.plugins.scala.lang.psi.types.{BaseTypes, ScType, ScTypeExt}
 
 /**
  * Checks if the type is a subtype of scala.collection.immutable.Seq[T] and returns T if so. Otherwise returns None.
  */
-def unwrapSeq(tpe: ScType): Option[ScType] =
+def unwrapSeq(tpe: ScType)(using Smart): Option[ScType] =
   val dealiasedType = tpe.removeAliasDefinitions()
 
   // Если tpe === Seq, то его может не быть в списке предков

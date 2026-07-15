@@ -9,7 +9,7 @@ object JavaMillLanguageConfigurator extends MillLanguageConfigurator:
 
   override def generateConfig(isYaml: Boolean): String =
     if isYaml then
-      s"""# build.yaml
+      s"""
          |extends: JavaModule
          |""".stripMargin
     else
