@@ -27,11 +27,3 @@ def assertAutocomplete(myFixture : CodeInsightTestFixture, text : String, expect
 end assertAutocomplete
 
 
-def assertMatches[A, B](value: A, matcher: A => Option[B], text: String = "Failed to match"): B =
-  matcher(value) match
-    case Some(value) =>
-      value
-    case None =>
-      assert(false, text)
-      ???
-end assertMatches
