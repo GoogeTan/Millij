@@ -34,7 +34,7 @@ object PsiParentElementMatcher:
     end appendTo
 
     override def test(value: PsiElement): Option[Element] =
-      tt.unapply(value)
+      if value == null then None else tt.unapply(value)
     end test
   end clazzPsiParentElementMatcher
 
@@ -62,7 +62,8 @@ object PsiParentElementMatcher:
     end appendTo
 
     override def test(value: PsiElement): Option[Either[Element1, Element2]] =
-      EPP1.test(value).map(Left(_)).orElse(EPP2.test(value).map(Right(_)))
+      if value == null then None
+      else EPP1.test(value).map(Left(_)).orElse(EPP2.test(value).map(Right(_)))
     end test
   end unionPsiParentElementMatcher
 
@@ -85,7 +86,8 @@ object PsiParentElementMatcher:
     end appendTo
 
     override def test(value: PsiElement): Option[Head *: Tail] =
-      HPP.test(value).zip(TCT.test(value.getParent)).map(_ *: _)
+      if value == null then None
+      else HPP.test(value).zip(TCT.test(value.getParent)).map(_ *: _)
     end test
   end inductivePsiParentElementMatcher
 
