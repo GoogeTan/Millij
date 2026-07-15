@@ -82,3 +82,7 @@ tasks {
 tasks.withType(Jar::class.java) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
+
+tasks.withType<org.gradle.api.tasks.scala.ScalaCompile> {
+    scalaCompileOptions.forkOptions.memoryMaximumSize = "4g"
+}
