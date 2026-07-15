@@ -31,6 +31,7 @@ dependencies {
         bundledPlugin("org.jetbrains.kotlin")
         bundledPlugin("org.jetbrains.idea.maven")
         testFramework(TestFrameworkType.Platform)
+        testFramework(TestFrameworkType.Plugin.Java)
         bundledPlugin("org.jetbrains.plugins.yaml")
     }
 }
@@ -81,6 +82,13 @@ tasks {
 
 tasks.withType(Jar::class.java) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.withType<Test> {
+    systemProperty("jna.nosys", "true")
+    testLogging {
+        showStandardStreams = true
+    }
 }
 
 tasks.withType<org.gradle.api.tasks.scala.ScalaCompile> {
