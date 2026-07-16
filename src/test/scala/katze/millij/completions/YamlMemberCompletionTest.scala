@@ -133,12 +133,40 @@ class YamlMemberCompletionTest extends BasePlatformTestCase:
         |""".stripMargin
     )
     val lookupElements = myFixture.complete(CompletionType.SMART)
-    assertEquals(3, lookupElements.length)
     assertNotNull("Lookup elements should not be null", lookupElements)
+    assertEquals(3, lookupElements.length)
     val sortedLookupStrings = lookupElements.map(_.getLookupString).sorted
     assertArrayEquals(
       sortedLookupStrings.map(a => a) : Array[Any],
       Array[Any]("a", "b", "c") : Array[Any]
     )
   end testDependentPathMemberTypeCompletion
+  
+  def testMultiFileScopingResolution(): Unit =
+    myFixture.addFileToProject(
+      "build.mill.yaml",
+      """
+        |object A:
+        | extends: [Dep2, Dep4]
+        |""".stripMargin
+    )
+    val coreFile = myFixture.addFileToProject(
+      "core/build.mill.yaml",
+      """
+        |object A:
+        | extends: [Dep2, Dep5]
+        |object C:
+        | extends: [A.Dep3]
+        | <caret>
+        |""".stripMargin
+    )
+    myFixture.configureFromExistingVirtualFile(coreFile.getVirtualFile)
+    val lookupElements = myFixture.complete(CompletionType.SMART)
+    assertNotNull("Lookup elements should not be null", lookupElements)
+    assertEquals(2, lookupElements.length)
+    val elementFound = lookupElements.head
+    val presentation = LookupElementPresentation()
+    elementFound.renderElement(presentation)
+    assertEquals("String", presentation.getTypeText)
+  end testMultiFileScopingResolution
 end YamlMemberCompletionTest

@@ -7,9 +7,15 @@ trait Dep1 {
 trait Dep2 extends Dep1 {
  trait Dep3 {
    def foo : A
+   def bar : A
  }
+
 }
 
 trait Dep4 extends Dep1 {
  override type A = mill.api.TestStruct
 }
+trait Dep5 extends Dep1 {
+  override type A = String
+}
+
