@@ -102,8 +102,6 @@ end placeFolder
  * Tries to resolve a place of an element in a YAML mill config.
  * It goes up to the document root and then builds position down.
  *
- * TODO make it tailrec by collecrint the whole path to the list and then by folding it.
- *
  * @param element Element to resolve a place of
  * @param fieldPlace A place of a field inside a Place.
  * @param modulePlace Module declaration place
