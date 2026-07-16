@@ -28,9 +28,4 @@ final case class NamespacedPath[F[_], Segment](namespace : SegmentedPath[F, Segm
   def asQualified(using Foldable[F], Show[Segment]): String =
     namespace.asQualified + "::" + path.asQualified
   end asQualified
-
-  def asFilePath(using Foldable[F], Show[Segment]): String =
-    //TODO check for ampty namespace
-    namespace.asFilePath + "/" + path.asFilePath
-  end asFilePath
 end NamespacedPath
