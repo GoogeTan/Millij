@@ -19,8 +19,8 @@ final class BspImportNotificationProvider extends EditorNotificationProvider:
     val result = for
       ext <- Option(file.getName).filter(_.endsWith(".mill.yaml"))
       baseDir <- Option(ProjectUtil.guessProjectDir(project))
-      bspPath = baseDir.toNioPath.resolve(".bsp").toFile//TODO it fails in tests
-      if !bspPath.exists()
+      bspPath = baseDir.findChild(".bsp")
+      if bspPath == null || !bspPath.exists()
     yield
       (editor: FileEditor) => createPanel(project, baseDir, editor)
 
