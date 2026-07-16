@@ -29,11 +29,12 @@ enum ResolvedSymbol[Segment](val element : PsiElement):
     override val element : YAMLMapping
   ) extends ResolvedSymbol[Segment](element)
 
-  //TODO handle classes here
   def scalaTraitType(using ProjectContext) : Option[ScType] =
     this match
       case ResolvedSymbol.ScalaTrait(Some(parentType), element) => Some(ScProjectionType(parentType, element))
       case ResolvedSymbol.ScalaTrait(None, element) => Some(ScDesignatorType(element))
+      case ResolvedSymbol.ScalaClass(Some(parentType), element) => Some(ScProjectionType(parentType, element))
+      case ResolvedSymbol.ScalaClass(None, element) => Some(ScDesignatorType(element))
       case _ => None
     end match
   end scalaTraitType
