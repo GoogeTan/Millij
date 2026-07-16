@@ -63,19 +63,6 @@ final class MillModuleService(project: Project):
     ).asScala.toList
   end rawModuleByName
 
-  def rawModuleByName(name : NamespacedPath[List, ScalaIdentifier]) : Option[ModuleDeclaration[ScalaIdentifier]] =
-    val map = FileBasedIndex.getInstance().getFileData(
-      YamlModuleIndex.Name,
-      ???,//TODO
-      project
-    )
-    val fullPath = name.namespace
-    if map.containsKey(fullPath) then
-      Some(map.get(fullPath))
-    else
-      None
-  end rawModuleByName
-
   def resolveModuleByName(name : SegmentedPath[List, ScalaIdentifier])(using Smart) : List[ModuleType[ScalaIdentifier]] =
     rawModuleByName(name).map(typeModule)
   end resolveModuleByName
