@@ -16,7 +16,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScTemplateDefinition}
 import org.jetbrains.plugins.scala.lang.psi.types.result.Failure
 import org.jetbrains.yaml.psi.YAMLPsiElement
-import org.jetbrains.plugins.scala.lang.psi.types.{ScType, TermSignature}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAliasDefinition
+import org.jetbrains.plugins.scala.lang.psi.types.{AliasType, ScType, ScTypeExt, TermSignature, TypePresentationContext}
 import org.jetbrains.plugins.scala.project.ProjectContext
 
 /**
@@ -43,6 +44,7 @@ def memberCompletionProvider(logger : Logger)(using Smart) : CoolCompletionProvi
 end memberCompletionProvider
 
 def makeLookupElementForTypedDefinition(term : TermSignature, logger : Logger)(using Smart, ProjectContext) : LookupElement =
+  given TypePresentationContext = TypePresentationContext(term.namedElement)
   val typeName = termSignatureType(term).map(definitionTypeString(_, logger))
 
   typeName.fold(
@@ -57,6 +59,12 @@ def makeLookupElementForTypedDefinition(term : TermSignature, logger : Logger)(u
   )
 end makeLookupElementForTypedDefinition
 
-def definitionTypeString(scType : ScType, logger : Logger)(using Smart) : String =
-  unwrapMillTask(scType).toString()
+def definitionTypeString(scType : ScType, logger : Logger)(using Smart, TypePresentationContext) : String =
+  fullyDealias(unwrapMillTask(scType)).presentableText
 end definitionTypeString
+
+def fullyDealias(tpe: ScType): ScType =
+  tpe match
+    case AliasType(alias: ScTypeAliasDefinition, _, Right(upper: ScType), _) => fullyDealias(upper)
+    case _ => tpe
+end fullyDealias
