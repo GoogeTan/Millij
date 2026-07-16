@@ -2,6 +2,7 @@ package katze.millij.place
 
 import cats.Applicative
 import cats.syntax.all.*
+import katze.millij.file.elementsFilePath
 import katze.millij.data.module.NamespacedPath
 import katze.millij.data.{ScalaIdentifier, SegmentedPath}
 import org.jetbrains.yaml.psi.{YAMLMapping, YAMLPsiElement}
