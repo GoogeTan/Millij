@@ -27,27 +27,46 @@ final class ModuleTypeResolverImpl[Segment : {Eq, Show}](
 
   def typeModule(module: ModuleDeclaration[Segment], resolution : List[SegmentedPath[List, Segment]])(using Smart) : ModuleType[Segment] =
     if resolution.contains(module.segmentedPath) then
-      //TODO do something in recursive cases.
-      throw new NotImplementedError(s"Recursive dependencies handling is not implemented yet. Cycle length: ${resolution.size}. The cycle: ${resolution.map(_.asQualified).mkString(" -> ")}")
+      // In case of recursive dependencies just fall back to empty type.
+      // We don't cache it here. It will be saved by some caller.
+      ModuleType(
+        module.superTypes.map(_.unresolved),
+        List(
+          DependencyCycle(
+            NonEmptyList.ofInitLast(
+              resolution.takeWhile(_ != module.segmentedPath),
+              module.segmentedPath
+            )
+          )
+        )
+      )
+    else
+      cacheResolvedModule(
+        module.segmentedPath,
+        {
+          // Root module can not depend on other modules. So the search is made only in scala space.
+          val resolvedSupers =
+            if module.segmentedPath.length == 0 then
+              module.superTypes.map(parent =>
+                resolveScalaQualifiedPath(module.path, parent, module.segmentedPath :: resolution)
+              )
+            else
+              module.superTypes.map(parent =>
+                resolvePath(module.path, parent, module.segmentedPath :: resolution)
+              )
+          val cycles =
+            for 
+              parent <- resolvedSupers
+              case (_, ResolvedSymbol.YamlModule(_, ModuleType(_, cycles), _)) <- parent.resolved
+              cycle <- cycles
+              if cycle.isOnCycle(module.segmentedPath)
+            yield cycle
+            
+          ModuleType(resolvedSupers, cycles)
+        }
+      )
     end if
-    cacheResolvedModule(
-      module.segmentedPath,
-      {
-        // Root module can not depend on other modules. So the search is made only in scala space.
-        val resolvedSupers =
-          if module.segmentedPath.length == 0 then
-            module.superTypes.map(parent =>
-              resolveScalaQualifiedPath(module.path, parent, module.segmentedPath :: resolution)
-            )
-          else
-            module.superTypes.map(parent =>
-              resolvePath(module.path, parent, module.segmentedPath :: resolution)
-            )
-        ModuleType(resolvedSupers)
-      }
-    )
   end typeModule
-
 
   def resolveScalaQualifiedPath(
     ownPath : NamespacedPath[List, Segment],

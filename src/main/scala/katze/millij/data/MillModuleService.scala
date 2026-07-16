@@ -3,13 +3,15 @@ package katze.millij.data
 import cats.data.NonEmptyList
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.{CachedValueProvider, CachedValuesManager, PsiModificationTracker}
 import com.intellij.util.indexing.FileBasedIndex
-import katze.millij.data.module.{YamlModuleIndex, ModuleDeclaration, NamespacedPath, findYamlModuleMapping}
-import katze.millij.scalatypes.{resolveTypeMember, resolvePackageMember}
+import katze.millij.data.module.{ModuleDeclaration, NamespacedPath, YamlModuleIndex, findYamlModuleMapping}
+import katze.millij.scalatypes.{resolvePackageMember, resolveTypeMember}
 import org.jetbrains.plugins.scala.caches.RecursionManager
 import org.jetbrains.plugins.scala.project.ProjectContext
+import katze.millij.file.*
 
 import java.util.concurrent.ConcurrentHashMap
 import scala.jdk.CollectionConverters.*
@@ -63,7 +65,27 @@ final class MillModuleService(project: Project):
     ).asScala.toList
   end rawModuleByName
 
+  def rawModuleByName(name : NamespacedPath[List, ScalaIdentifier]) : Option[ModuleDeclaration[ScalaIdentifier]] =
+    val moduleFileName =
+      name.namespace.map(_.toString).addNonEmpty("build.mill.yaml")
+    virtualFileByRelativePath(
+      project,
+      moduleFileName
+    ).flatMap:
+      file =>
+        val found = FileBasedIndex.getInstance().getFileData(
+          YamlModuleIndex.Name,
+          file,
+          project
+        )
+        Option(found.get(name.fullPath))
+  end rawModuleByName
+
   def resolveModuleByName(name : SegmentedPath[List, ScalaIdentifier])(using Smart) : List[ModuleType[ScalaIdentifier]] =
+    rawModuleByName(name).map(typeModule)
+  end resolveModuleByName
+
+  def resolveModuleByName(name : NamespacedPath[List, ScalaIdentifier])(using Smart) : Option[ModuleType[ScalaIdentifier]] =
     rawModuleByName(name).map(typeModule)
   end resolveModuleByName
 

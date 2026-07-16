@@ -4,7 +4,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScCompoundType, ScType}
 import org.jetbrains.plugins.scala.project.ProjectContext
 
 final case class ModuleType[Segment](
-  dependencies : List[ResolvedPath[List, Segment, ResolvedSymbol[Segment]]]
+  dependencies : List[ResolvedPath[List, Segment, ResolvedSymbol[Segment]]],
+  cyclesOfDependnecies : List[DependencyCycle[Segment]]
 ):
   def ownType(using ProjectContext) : ScCompoundType =
     ScCompoundType(

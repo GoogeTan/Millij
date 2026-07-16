@@ -1,8 +1,10 @@
 package katze.millij.annotator
 
+import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.psi.PsiElement
 import katze.millij.annotator.{CoolAnnotatorAdapter, mvnDepsAnnotator}
 import katze.millij.cool.{CoolPattern, PsiElementMatcher, PsiParentElementMatcher}
+import katze.millij.data.MillijBundle
 import katze.millij.place.*
 import katze.millij.psi.*
 import org.jetbrains.yaml.psi.*
@@ -14,20 +16,25 @@ final class SmartMillYamlAnnotators extends SmartAnnotators(
       CoolPattern.elementAndParents[YAMLKey[PsiElement], (YAMLKeyValue, YAMLMapping)]()
     ),
     CoolAnnotatorAdapter(
-      extendsListBlockAnnotator(element =>
-        enclosingModule(element).flatMap(enclosingModule =>
-          Option
-            .when(!isValidExtendsBlockMember(enclosingModule, element))(
-              unexistingTraitNameError(element.getTextValue)
-            )
-        )
+      extendsBlockMembersAnnotator(
+        (enclosingModule, scalar, annotationHolder, isOnCycle) =>
+          if isOnCycle then
+            annotationHolder
+              .newAnnotation(HighlightSeverity.ERROR, MillijBundle.message("cycled.dependencies.error"))
+              .range(scalar)
+              .create()
+          else if !isValidExtendsBlockMember(enclosingModule, scalar) then
+            annotationHolder
+              .newAnnotation(HighlightSeverity.ERROR, MillijBundle.message("unexisting.trait.name.error", scalar.getTextValue))
+              .range(scalar)
+              .create()
       ),
-      CoolPattern.elementAndParent[
-        YAMLScalar,
-        Either[
-          (YAMLSequenceItem, YAMLSequence, YAMLKeyValueWithKey["extends"]),
-          YAMLKeyValueWithKey["extends"]
-        ]
+      CoolPattern.elementAndParents[
+        YAMLKeyValueWithKey["extends"],
+        (
+          YAMLMapping,
+            YAMLMillModule
+          )
       ]()
     ),
     CoolAnnotatorAdapter(

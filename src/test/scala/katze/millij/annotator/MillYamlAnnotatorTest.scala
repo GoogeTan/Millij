@@ -8,6 +8,7 @@ import org.junit.Assert.*
 import scala.jdk.CollectionConverters.*
 
 //TODO add cases where build.A.Trait is overridden
+//TODO add tests where a parent is not found
 class MillYamlAnnotatorTest extends BasePlatformTestCase:
   override def getProjectDescriptor: LightProjectDescriptor = MillProjectDescriptor
 
@@ -86,7 +87,7 @@ class MillYamlAnnotatorTest extends BasePlatformTestCase:
     assertFalse("Should not flag valid member scalaVersion", validMemberError.isDefined)
   end testUnexistingMembersAnnotator
 
-  def testHighlighting(): Unit =
+  def testMavenDependenciesHighlighting(): Unit =
     myFixture.configureByText(
       "build.mill.yaml",
       """
@@ -110,5 +111,20 @@ class MillYamlAnnotatorTest extends BasePlatformTestCase:
         |""".stripMargin
     )
     myFixture.checkHighlighting(false, true, false)
-  end testHighlighting
+  end testMavenDependenciesHighlighting
+  
+  def testCyclicModuleDependenciesErrorHighlighting(): Unit =
+    myFixture.configureByText(
+      "build.mill.yaml",
+      """
+        |<info descr="null" textAttributesKey="MILL_YAML_OBJECT_KEYWORD">object</info><info descr="null" textAttributesKey="MILL_YAML_MODULE_NAME"> A</info>:
+        | extends: <error descr="Cyclic dependencies are not allowed" textAttributesKey="ERRORS_ATTRIBUTES">B.Smth</error>
+        |<info descr="null" textAttributesKey="MILL_YAML_OBJECT_KEYWORD">object</info><info descr="null" textAttributesKey="MILL_YAML_MODULE_NAME"> B</info>:
+        | extends: [SbtModule, <error descr="Cyclic dependencies are not allowed" textAttributesKey="ERRORS_ATTRIBUTES">A.Smth</error>]
+        |<info descr="null" textAttributesKey="MILL_YAML_OBJECT_KEYWORD">object</info><info descr="null" textAttributesKey="MILL_YAML_MODULE_NAME"> C</info>:
+        | extends: B.SbtTests
+        |""".stripMargin
+    )
+    myFixture.checkHighlighting(false, true, false)
+  end testCyclicModuleDependenciesErrorHighlighting
 end MillYamlAnnotatorTest
