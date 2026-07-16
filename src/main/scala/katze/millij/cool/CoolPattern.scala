@@ -122,7 +122,7 @@ object CoolPattern:
         level
       ),
       element =>
-        PP.test(PsiChild.unapplySeq(element).apply(level))//TODO extract efficiently
+        PP.test(PsiChild.unapplySeq(element).apply(level))
     )
   end parent
 end CoolPattern
