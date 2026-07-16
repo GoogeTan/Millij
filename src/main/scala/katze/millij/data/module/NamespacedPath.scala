@@ -19,8 +19,8 @@ final case class NamespacedPath[F[_], Segment](namespace : SegmentedPath[F, Segm
     val listNamespace = namespace.mapK(foldableToListK)
     NonEmptyList.ofInitLast(
       path.parts.mapAccumulate(Nil : List[Segment])((currentPath, part) =>
-        (currentPath :+ part, listNamespace + SegmentedPath(currentPath :+ part))
-      )._2.toList.filter(_ != ownFullPath),
+        (currentPath :+ part, listNamespace + SegmentedPath(currentPath))
+      )._2.toList,
       SegmentedPath(Nil)
     ).distinctBy(_.asQualified)
   end searchScopes
