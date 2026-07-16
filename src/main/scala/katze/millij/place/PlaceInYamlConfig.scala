@@ -52,7 +52,7 @@ def nestedModulePlaceFromYamlMapping[F[_] : Applicative, Type](
 ) : F[PlaceInYamlConfig[Type]] =
   parentPlace match
     case PlaceInYamlConfig.Module(_, inFilePath, _) =>
-      modulePlaceOfYamlMapping(inFilePath.addPathSegment(name), moduleBody, resolveParent(inFilePath, _))
+      modulePlaceOfYamlMapping(inFilePath.addPathSegment(name), moduleBody, resolveParent(inFilePath.addPathSegment(name), _))
     case rhs : PlaceInYamlConfig.Member[Type] =>
       ifCalledOnMemberScope(rhs)
 end nestedModulePlaceFromYamlMapping
