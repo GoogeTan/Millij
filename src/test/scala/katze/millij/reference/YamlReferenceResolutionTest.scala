@@ -117,6 +117,29 @@ class YamlReferenceResolutionTest extends BasePlatformTestCase:
     checkReference("C.TheInner", Yaml(Some("C")), Type("mill.scalalib.TheNestiest.TheNest.TheInner"))
   end testChainedResolution
 
+
+  def testMultiFileChainedResolution(): Unit =
+    myFixture.addFileToProject(
+      "build.mill.yaml",
+      """
+        |object A:
+        | extends: [TheNestiest]
+        |""".stripMargin
+    )
+    val coreFile = myFixture.addFileToProject(
+      "core/build.mill.yaml",
+      """
+        |object B:
+        | extends: [C.TheInner]
+        |object C:
+        | extends: [A.TheNest]
+        |""".stripMargin
+    )
+    myFixture.configureFromExistingVirtualFile(coreFile.getVirtualFile)
+    checkReference("A.TheNest", Yaml(Some("A")), Type("mill.scalalib.TheNestiest.TheNest"))
+    checkReference("C.TheInner", Yaml(Some("C")), Type("mill.scalalib.TheNestiest.TheNest.TheInner"))
+  end testMultiFileChainedResolution
+
   //TODO refactor me
   private def checkReference(textToFind: String, expectedSegments: Expected*): Unit =
     val fileText = myFixture.getFile.getText
