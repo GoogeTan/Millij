@@ -44,7 +44,7 @@ end extendsValueReferenceProvider
 
 def makeExtendsReference(scalar: YAMLScalar, module : YAMLMapping) : List[PsiReference] =
   val module = enclosingModule(scalar).getOrElse(return Nil)
-  ScalaReferenceFactory.makeScalaReferencesFor(scalar, module).toList
+  ExtendsBlockMemberReference.makeScalaReferencesFor(scalar, module).toList
 end makeExtendsReference
 
 def filesRootModule(file : PsiFile) : Option[SegmentedPath[List, ScalaIdentifier]] =

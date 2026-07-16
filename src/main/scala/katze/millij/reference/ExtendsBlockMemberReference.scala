@@ -11,8 +11,14 @@ import org.jetbrains.yaml.psi.YAMLScalar
 
 import scala.collection.mutable.ArrayBuffer
 
-//TODO document arguments
-final class ScalaSegmentReference(
+/**
+ * A reference in extends block in mill module in yaml config. Usually 
+ * @param element Text element in extends block to search for references
+ * @param range A prefix of the element to search for reference in(e.g. word ScalaModule in mill.scalalib.ScalaModule)
+ * @param cumulativePath Reference to resolve
+ * @param modulePath Enclosing module name. 
+ */
+final class ExtendsBlockMemberReference(
   element: YAMLScalar,
   range: TextRange,
   cumulativePath: SegmentedPath[NonEmptyList, ScalaIdentifier],
@@ -33,9 +39,9 @@ final class ScalaSegmentReference(
   end multiResolve
 
   override def getVariants: Array[AnyRef] = Array.empty
-end ScalaSegmentReference
+end ExtendsBlockMemberReference
 
-object ScalaReferenceFactory:
+object ExtendsBlockMemberReference:
   def makeScalaReferencesFor(psiElement: YAMLScalar, modulePath : NamespacedPath[List, ScalaIdentifier]): Array[PsiReference] =
     val rawText = psiElement.getText
     val textValue = psiElement.getTextValue
@@ -60,10 +66,10 @@ object ScalaReferenceFactory:
         )(_.addNonEmpty(part))
       )
 
-      references += new ScalaSegmentReference(psiElement, range, cumulativePath.get, modulePath)
+      references += new ExtendsBlockMemberReference(psiElement, range, cumulativePath.get, modulePath)
       currentOffset = segmentEnd + 1
     end for
 
     references.toArray
   end makeScalaReferencesFor
-end ScalaReferenceFactory
+end ExtendsBlockMemberReference
