@@ -16,7 +16,7 @@ class MillStringCompletionConfidence extends CompletionConfidence:
   override def shouldSkipAutopopup(editor: Editor, contextElement: PsiElement, psiFile: PsiFile, offset: Int): ThreeState =
     handleConfidence(contextElement, psiFile)
 
-  private def handleConfidence(contextElement: PsiElement, psiFile: PsiFile): ThreeState =//TODO remove logs
+  private def handleConfidence(contextElement: PsiElement, psiFile: PsiFile): ThreeState =
     if !psiFile.getName.endsWith(".mill") && !psiFile.getName.endsWith(".sc") then
       return ThreeState.UNSURE
     contextElement.getParent match
