@@ -137,4 +137,8 @@ object SegmentedPath:
       path.parts.toNel.map(SegmentedPath(_))
     end asNonEmpty
   end extension
+
+  given eqInstance[F[_], Segment](using Eq[F[Segment]]): Eq[SegmentedPath[F, Segment]] =
+    Eq.by(_.parts)
+  end eqInstance
 end SegmentedPath
