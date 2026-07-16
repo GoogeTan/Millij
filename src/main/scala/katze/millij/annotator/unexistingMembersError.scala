@@ -8,16 +8,18 @@ import katze.millij.place
 import katze.millij.place.PlaceInYamlConfig.{Member, Module}
 import katze.millij.place.{PlaceInYamlConfig, richPlaceOf, yamlDefinableMembersOfScope}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScType, ScTypeExt, TypePresentationContext}
+import org.jetbrains.plugins.scala.project.ProjectContext
 import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping}
 
 def unexistingMembersError(mapping : YAMLMapping, kv : YAMLKeyValue)(using Smart) : Option[String] =
+  given ProjectContext = ProjectContext.fromPsi(mapping)
   richPlaceOf(mapping).toOption.flatMap(scope =>
     scope match
       case Member(_, expectedType, _) if isMvnDependency(expectedType) =>
         None
       case _ =>
         val possibleMembers = yamlDefinableMembersOfScope(scope)
-        if possibleMembers.exists(_.getName() === kv.getKeyText) then
+        if possibleMembers.exists(_.name === kv.getKeyText) then
           None
         else
           given context: TypePresentationContext = TypePresentationContext(kv)

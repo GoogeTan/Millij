@@ -7,7 +7,8 @@ import katze.millij.data.{ScalaIdentifier, Smart}
 import katze.millij.scalatypes.*
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
-import org.jetbrains.plugins.scala.lang.psi.types.ScType
+import org.jetbrains.plugins.scala.lang.psi.types.{ScCompoundType, ScType, TermSignature}
+import org.jetbrains.plugins.scala.project.ProjectContext
 import org.jetbrains.yaml.psi.*
 
 import scala.jdk.CollectionConverters.*
@@ -111,12 +112,17 @@ end sequenceElementPlace
 /**
  * Attempts to build a place of a member. It returns [[None]] only if there is no member with given name.
  */
-def memberPlace(scope: PlaceInYamlConfig[ScType], membersName: String)(using Smart): Option[PlaceInYamlConfig[ScType]] =
+def memberPlace(scope: PlaceInYamlConfig[ScType], membersName: String)(using Smart, ProjectContext): Option[PlaceInYamlConfig[ScType]] =
   def resolveMemberType(baseTypes: List[ScType]): Option[ScType] =
-    baseTypes.iterator
-      .flatMap(findMemberType(_, membersName))
-      .nextOption()
-      .map(unwrapMillTask)
+    findMemberType(
+      ScCompoundType(
+        baseTypes,
+        true,
+        Map(),
+        Map()
+      ),
+      membersName
+    ).map(unwrapMillTask)
 
   scope match
     case PlaceInYamlConfig.Module(extendList, _, _) =>
@@ -132,13 +138,10 @@ end memberPlace
 /**
  * Returns all the members suitable for being defined in a YAML config.
  */
-def yamlDefinableMembersOfScope(using Smart) : PlaceInYamlConfig[ScType] => List[ScTypedDefinition] =
+def yamlDefinableMembersOfScope(using Smart, ProjectContext) : PlaceInYamlConfig[ScType] => Seq[TermSignature] =
   case PlaceInYamlConfig.Module(extendList, _, _) =>
     extendList
-      .flatMap(extractTemplateDefinition)
       .flatMap(yamlDefinableMembersOf)
   case PlaceInYamlConfig.Member(_, expectedType, _) =>
-    extractTemplateDefinition(expectedType)
-      .toList
-      .flatMap(yamlDefinableMembersOf)
+    yamlDefinableMembersOf(expectedType)
 end yamlDefinableMembersOfScope

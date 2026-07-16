@@ -5,10 +5,12 @@ import com.intellij.icons.AllIcons
 import com.intellij.psi.{PsiElement, PsiReferenceBase}
 import katze.millij.data.Smart
 import katze.millij.place.{richPlaceOf, yamlDefinableMembersOfScope}
+import org.jetbrains.plugins.scala.project.ProjectContext
 import org.jetbrains.yaml.psi.YAMLPsiElement
 
 final class YamlMemberReference(element: YAMLPsiElement, nameToSearch: String) extends PsiReferenceBase[PsiElement](element):
   override def resolve(): PsiElement =
+    given ProjectContext = ProjectContext.fromPsi(element)
     Smart(element.getProject) {
       richPlaceOf(element)
         .map(yamlDefinableMembersOfScope)
@@ -17,13 +19,14 @@ final class YamlMemberReference(element: YAMLPsiElement, nameToSearch: String) e
           variants =>
             variants
               .find(_.name == nameToSearch)
-              .map(_.getNavigationElement)
+              .map(_.namedElement)
               .orNull
         )
     }.orNull
   end resolve
 
   override def getVariants: Array[AnyRef] =
+    given ProjectContext = ProjectContext.fromPsi(element)
     Smart(element.getProject) {
       richPlaceOf(element)
         .map(yamlDefinableMembersOfScope)

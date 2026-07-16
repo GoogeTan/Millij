@@ -6,6 +6,7 @@ import katze.millij.annotator.isMvnDependency
 import katze.millij.data.module.NamespacedPath
 import katze.millij.data.{ScalaIdentifier, SegmentedPath, Smart}
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
+import org.jetbrains.plugins.scala.project.ProjectContext
 import org.jetbrains.yaml.psi.{YAMLMapping, YAMLPsiElement}
 
 import scala.jdk.CollectionConverters.*
@@ -18,7 +19,7 @@ final class PlaceConfigResolver[F[_] : Applicative](
   expectedRhs: PlaceInYamlConfig[ScType] => F[PlaceInYamlConfig[ScType]],
   expectedSequence: PlaceInYamlConfig[ScType] => F[PlaceInYamlConfig[ScType]],
   unexpectedPsi: List[YAMLPsiElement] => F[PlaceInYamlConfig[ScType]]
-)(using Smart) extends YAMLConfigResolver[F, PlaceInYamlConfig[ScType]]:
+)(using Smart, ProjectContext) extends YAMLConfigResolver[F, PlaceInYamlConfig[ScType]]:
 
   override def field(scope: PlaceInYamlConfig[ScType], name: String): F[PlaceInYamlConfig[ScType]] =
     scope match
@@ -79,7 +80,7 @@ object PlaceConfigResolver:
   def apply(
     filePath : SegmentedPath[List, ScalaIdentifier],
     search: (NamespacedPath[List, ScalaIdentifier], String) => EitherString[Option[ScType]],
-  )(using Smart): PlaceConfigResolver[EitherString] =
+  )(using Smart, ProjectContext): PlaceConfigResolver[EitherString] =
     new PlaceConfigResolver[EitherString](
       filePath = filePath,
       resolveParent = search,
@@ -94,7 +95,7 @@ object PlaceConfigResolver:
   def option(
     filePath : SegmentedPath[List, ScalaIdentifier],
     search: (NamespacedPath[List, ScalaIdentifier], String) => Option[ScType],
-  )(using Smart): PlaceConfigResolver[Option] =
+  )(using Smart, ProjectContext): PlaceConfigResolver[Option] =
     new PlaceConfigResolver[Option](
       filePath = filePath,
       resolveParent = (m, s) => Some(search(m, s)),

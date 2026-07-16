@@ -160,6 +160,7 @@ def richPlaceConfigResolver(
   project : Project,
   relativePath : SegmentedPath[List, ScalaIdentifier]
 )(using Smart): PlaceConfigResolver[EitherString] =
+  given ProjectContext = ProjectContext.fromProject(project)
   PlaceConfigResolver(relativePath, richPlaceSearch(project))
 end richPlaceConfigResolver
 
@@ -168,6 +169,7 @@ def richPlaceConfigResolverOption(
   project : Project,
   relativePath : SegmentedPath[List, ScalaIdentifier]
 )(using Smart): PlaceConfigResolver[Option] =
+  given ProjectContext = ProjectContext.fromProject(project)
   PlaceConfigResolver.option(relativePath, richPlaceSearch[Id](project))
 end richPlaceConfigResolverOption
 

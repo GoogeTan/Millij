@@ -10,12 +10,14 @@ import katze.millij.completions.cool.CoolCompletionProvider
 import katze.millij.data.Smart
 import katze.millij.place.{richPlaceOf, yamlDefinableMembersOfScope}
 import katze.millij.psi.CompletionPosition
-import katze.millij.scalatypes.unwrapMillTask
+import katze.millij.scalatypes.{termSignatureType, unwrapMillTask}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil.inNameContext
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScTemplateDefinition}
 import org.jetbrains.plugins.scala.lang.psi.types.result.Failure
 import org.jetbrains.yaml.psi.YAMLPsiElement
+import org.jetbrains.plugins.scala.lang.psi.types.{ScType, TermSignature}
+import org.jetbrains.plugins.scala.project.ProjectContext
 
 /**
  * Adds completions for module members and object params.
@@ -28,6 +30,7 @@ def memberCompletionProvider(logger : Logger)(using Smart) : CoolCompletionProvi
     context: ProcessingContext,
     resultSet: CompletionResultSet
   ) =>
+    given ProjectContext = ProjectContext.fromPsi(psiElement)
     richPlaceOf(yamlElement) match
       case Left(errValue) =>
         logger.debug(s"Couldn't build completions for $psiElement of class ${psiElement.getClass.getSimpleName}:\n ${errValue}")
@@ -39,47 +42,21 @@ def memberCompletionProvider(logger : Logger)(using Smart) : CoolCompletionProvi
     end match
 end memberCompletionProvider
 
-def makeLookupElementForTypedDefinition(definition : ScTypedDefinition, logger : Logger)(using Smart) : LookupElement =
-  val name = definition.name
-  val typeName = definitionTypeString(definition, logger)
+def makeLookupElementForTypedDefinition(term : TermSignature, logger : Logger)(using Smart, ProjectContext) : LookupElement =
+  val typeName = termSignatureType(term).map(definitionTypeString(_, logger))
 
-  LookupElementBuilder
-    .create(name)
-    .withTypeText(typeName)
-    .withIcon(AllIcons.Nodes.Property)
+  typeName.fold(
+    LookupElementBuilder
+      .create(term.name)
+      .withIcon(AllIcons.Nodes.Property)
+  )(typeName =>
+    LookupElementBuilder
+      .create(term.name)
+      .withTypeText(typeName)
+      .withIcon(AllIcons.Nodes.Property)
+  )
 end makeLookupElementForTypedDefinition
 
-def definitionTypeString(definition : ScTypedDefinition, logger : Logger)(using Smart) : String =
-  definition
-    .`type`()
-    .map(unwrapMillTask)
-    .map(_.toString())
-    .leftMap(
-      error =>
-        logEncounterOfAnUnknownTypeWhileMakingLookup(definition, error, logger)
-        "Unknown type",
-    )
-    .merge
+def definitionTypeString(scType : ScType, logger : Logger)(using Smart) : String =
+  unwrapMillTask(scType).toString()
 end definitionTypeString
-
-def logEncounterOfAnUnknownTypeWhileMakingLookup(definition : ScTypedDefinition, failure : Failure, logger : Logger) : Unit =
-  enclosingEntity(definition) match
-    case Some(value) =>
-      logger.debug(
-        s"Got an unknown type in attempt to build lookup element for ${definition.name} from ${value.getPresentationName}:\n ${failure.toString()}"
-      )
-    case None =>
-      logger.debug(
-        s"Got an unknown type in attempt to build lookup element for ${definition.name}:\n ${failure.toString()}"
-      )
-end logEncounterOfAnUnknownTypeWhileMakingLookup
-
-/**
- * Tries to look up place where member was defined
- */
-def enclosingEntity : ScTypedDefinition => Option[ScTemplateDefinition] =
-  case inNameContext(member: ScMember) =>
-    Option(member.containingClass)
-  case _ =>
-    None
-end enclosingEntity
