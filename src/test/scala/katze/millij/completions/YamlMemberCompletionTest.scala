@@ -167,4 +167,26 @@ class YamlMemberCompletionTest extends BasePlatformTestCase:
       Array[Any]("a", "b", "c") : Array[Any]
     )
   end testNestedStructCompletion
+
+  def testDependentPathMemberTypeCompletion() : Unit =
+    myFixture.configureByText(
+      "build.mill.yaml",
+      """
+        |extends: [Dep2, Dep4]
+        |
+        |object inner:
+        | extends: Dep3
+        | foo:
+        |   <caret>
+        |""".stripMargin
+    )
+    val lookupElements = myFixture.complete(CompletionType.SMART)
+    assertEquals(3, lookupElements.length)
+    assertNotNull("Lookup elements should not be null", lookupElements)
+    val sortedLookupStrings = lookupElements.map(_.getLookupString).sorted
+    assertArrayEquals(
+      sortedLookupStrings.map(a => a) : Array[Any],
+      Array[Any]("a", "b", "c") : Array[Any]
+    )
+  end testDependentPathMemberTypeCompletion
 end YamlMemberCompletionTest
