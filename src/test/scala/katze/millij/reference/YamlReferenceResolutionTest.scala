@@ -12,53 +12,12 @@ import org.jetbrains.plugins.scala.project.settings.ScalaCompilerConfiguration
 
 class YamlReferenceResolutionTest extends BasePlatformTestCase:
   override def getProjectDescriptor: LightProjectDescriptor = Scala3ProjectDescriptor
+
+  override def getTestDataPath: String = "src/test/testData"
   
   override def setUp(): Unit =
     super.setUp()
-    myFixture.addFileToProject(
-      "src/mill/scalalib/ScalaModule.scala",
-      """package mill.scalalib
-        |
-        |trait ScalaModule
-        |""".stripMargin
-    )
-    myFixture.addFileToProject(
-      "src/mill/scalalib/SbtModule.scala",
-      """package mill.scalalib
-        |
-        |trait SbtModule extends ScalaModule {
-        |  trait SbtTests
-        |}
-        |""".stripMargin
-    )
-    myFixture.addFileToProject(
-      "src/mill/javalib/TestModule.scala",
-      """package mill.javalib
-        |
-        |trait TestModule
-        |
-        |object TestModule {
-        |  trait Utest
-        |}
-        |""".stripMargin
-    )
-    myFixture.addFileToProject(
-      "src/mill/javalib/PublishModule.scala",
-      """package mill.javalib
-        |trait PublishModule
-        |""".stripMargin
-    )
-    myFixture.addFileToProject(
-      "src/mill/scalalib/Nesting.scala",
-      """package mill.scalalib
-        |
-        |trait TheNestiest {
-        |  trait TheNest {
-        |   trait TheInner
-        |  }
-        |}
-        |""".stripMargin
-    )
+    myFixture.copyDirectoryToProject("scalaCode", "src")
   end setUp
 
   enum Expected:

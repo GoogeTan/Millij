@@ -11,36 +11,12 @@ import scala.jdk.CollectionConverters.*
 class MillYamlAnnotatorTest extends BasePlatformTestCase:
   override def getProjectDescriptor: LightProjectDescriptor = MillProjectDescriptor
 
+  override def getTestDataPath: String = "src/test/testData"
+
   override def setUp(): Unit =
     super.setUp()
     // Setup trait/module definitions for smart annotations
-    myFixture.addFileToProject(
-      "src/mill/api/Module.scala",
-      """package mill.api
-        |
-        |trait Module
-        |""".stripMargin
-    )
-    myFixture.addFileToProject(
-      "src/mill/javalib/Dep.scala",
-      """package mill.javalib
-        |
-        |trait Dep {
-        |  def overriddenField: String
-        |}
-        |""".stripMargin
-    )
-    myFixture.addFileToProject(
-      "src/mill/scalalib/ScalaModule.scala",
-      """package mill.scalalib
-        |
-        |trait ScalaModule extends mill.api.Module {
-        |  def scalaVersion: String
-        |  def mvnDeps: Seq[mill.javalib.Dep]
-        |  def someField: mill.javalib.Dep
-        |}
-        |""".stripMargin
-    )
+    myFixture.copyDirectoryToProject("scalaCode", "src")
   end setUp
 
   def testObjectInInappropriatePlace(): Unit =

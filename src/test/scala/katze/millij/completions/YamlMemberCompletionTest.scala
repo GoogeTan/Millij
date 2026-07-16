@@ -9,60 +9,12 @@ import org.junit.Assert.{assertArrayEquals, assertEquals, assertFalse, assertNot
 
 class YamlMemberCompletionTest extends BasePlatformTestCase:
   override def getProjectDescriptor: LightProjectDescriptor = MillProjectDescriptor
+
+  override def getTestDataPath: String = "src/test/testData"
   
   override def setUp(): Unit =
     super.setUp()
-    myFixture.addFileToProject(
-      "src/mill/api/Task.scala",
-      """
-        |package mill.api
-        |
-        |sealed trait Task[+T]
-        |""".stripMargin
-    )
-    myFixture.addFileToProject(
-      "src/mill/api/TestStruct.scala",
-      """
-        |package mill.api
-        |
-        |final case class TestStruct(val a : String, val b : String, val c : String)
-        |final case class NestedStruct(val a : String, val b : String, val c : TestStruct)
-        |""".stripMargin
-    )
-    myFixture.addFileToProject(
-      "src/mill/api/Module.scala",
-      """package mill.api
-        |
-        |trait Module
-        |""".stripMargin
-    )
-    myFixture.addFileToProject(
-      "src/mill/scalalib/ScalaModule.scala",
-      """package mill.scalalib
-        |
-        |trait ScalaModule extends mill.api.Module {
-        |  def scalaVersion : String
-        |
-        |  def seqMethod : Seq[mill.api.TestStruct]
-        |
-        |  def structMethods : mill.api.NestedStruct
-        |}
-        |""".stripMargin
-    )
-    myFixture.addFileToProject(
-      "src/mill/scalalib/SbtModule.scala",
-      """package mill.scalalib
-        |
-        |import mill.api._
-        |
-        |trait SbtModule extends ScalaModule {
-        |  trait SbtTests {
-        |     def something : String
-        |  }
-        |  def somethingWithTask : Task[String] 
-        |}
-        |""".stripMargin
-    )
+    myFixture.copyDirectoryToProject("scalaCode", "src")
   end setUp
 
   def testTopScopeMethodNameCompletion(): Unit =

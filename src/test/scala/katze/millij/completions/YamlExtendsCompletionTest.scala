@@ -9,39 +9,11 @@ import org.junit.Assert.*
 class YamlExtendsCompletionTest extends BasePlatformTestCase:
   override def getProjectDescriptor: LightProjectDescriptor = MillProjectDescriptor
 
+  override def getTestDataPath: String = "src/test/testData"
+
   override def setUp(): Unit =
     super.setUp()
-    myFixture.addFileToProject(
-      "src/mill/api/Module.scala",
-      """package mill.api
-        |
-        |trait Module
-        |""".stripMargin
-    )
-    myFixture.addFileToProject(
-      "src/mill/scalalib/ScalaModule.scala",
-      """package mill.scalalib
-        |
-        |trait ScalaModule extends mill.api.Module
-        |""".stripMargin
-    )
-    myFixture.addFileToProject(
-      "src/mill/scalalib/SbtModule.scala",
-      """package mill.scalalib
-        |
-        |trait SbtModule extends ScalaModule {
-        |  trait SbtTests
-        |  trait SbtTests2
-        |}
-        |""".stripMargin
-    )
-    myFixture.addFileToProject(
-      "src/mill/scalalib/SbtModule2.scala",
-      """package mill.scalalib
-        |
-        |trait SbtModule2 extends mill.api.Module
-        |""".stripMargin
-    )
+    myFixture.copyDirectoryToProject("scalaCode", "src")
   end setUp
 
   def testExtendsKeywordCompletion(): Unit =
