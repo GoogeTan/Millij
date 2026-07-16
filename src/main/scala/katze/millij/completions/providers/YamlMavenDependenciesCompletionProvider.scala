@@ -4,6 +4,7 @@ import com.intellij.codeInsight.completion.*
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
 import katze.millij.*
+import katze.millij.annotator.isMvnDependency
 import katze.millij.completions.cool.CoolCompletionProvider
 import katze.millij.cool.CoolPattern
 import katze.millij.data.{MavenDependencyShared, Smart}
@@ -54,7 +55,7 @@ end cleanElementTextFromDummyIdentifier
  */
 def suggestMavenDependency(element: YAMLPsiElement, dependencyText: String, resultSet: CompletionResultSet)(using Smart): Unit =
   richPlaceOf(element).foreach:
-    case PlaceInYamlConfig.Member(_, expectedType, _) if expectedType.canonicalText.endsWith("Dep") =>//TODO unhardcode me
+    case PlaceInYamlConfig.Member(_, expectedType, _) if isMvnDependency(expectedType) =>
       MavenDependencyShared.searchAndSuggestDependencies(resultSet, "3.0.0", element.getProject, dependencyText)
     case _ =>
 end suggestMavenDependency
