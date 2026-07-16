@@ -78,10 +78,6 @@ final case class SegmentedPath[F[_], Segment](parts: F[Segment]):
   def unresolved[Target](using Foldable[F]) : ResolvedPath[List, Segment, Target] =
     ResolvedPath(Nil, parts.toList)
   end unresolved
-
-  //TODO remove crash
-  override def toString: String =
-    ???//THIS MUSTN'T EVER BE CALLED
 end SegmentedPath
 
 object SegmentedPath:
