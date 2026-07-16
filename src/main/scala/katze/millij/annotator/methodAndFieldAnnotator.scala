@@ -34,7 +34,6 @@ end unexistingMembersAnnotator
 
 /**
  * Annotates keys of module declaration, object parameter declaration, module member declaration. 
- * TODO make it work in dumb mode. It wants to know only type of scope without any details about types. It must be safe to do that. 
  */
 def methodAndFieldAnnotator(scopeOf : YAMLKeyValueWithNotKey["extends"] => Option[Boolean]) : CoolAnnotator[(YAMLKeyValueWithNotKey["extends"], YAMLMapping)] =
   case ((kv, mapping), annotationHolder) =>
