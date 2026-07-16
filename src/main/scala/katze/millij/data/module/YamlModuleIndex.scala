@@ -1,12 +1,8 @@
 package katze.millij.data.module
 
-import cats.syntax.all.*
-import com.intellij.openapi.module.Module
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.ProjectFileIndex
-import com.intellij.openapi.vfs.{VfsUtilCore, VirtualFile}
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.indexing.*
-import com.intellij.util.io.{DataExternalizer, EnumeratorStringDescriptor, KeyDescriptor}
+import com.intellij.util.io.{DataExternalizer, KeyDescriptor}
 import katze.millij.data.{ScalaIdentifier, SegmentedPath}
 import katze.millij.file.relativePathToContentRoot
 import katze.millij.place.{extractObjectName, getExtendsContentsOf}
