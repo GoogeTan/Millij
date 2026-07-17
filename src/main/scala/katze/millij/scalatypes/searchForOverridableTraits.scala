@@ -21,13 +21,17 @@ val millApiModuleName : SegmentedPath[NonEmptyList, ScalaIdentifier] =
  * @param project
  * @return
  */
-def searchForOverridableTraits(project: Project)(using Smart): Option[List[PsiClass]] =
+def searchForOverridableTraits(project: Project)(using Smart): Option[List[ScTrait | ScClass]] =
   millConfigModule(project).flatMap(millModule =>
     val buildScope = GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(millModule)
     project.getService(classOf[TypeSearchCache])
       .searchPsiClassDumb(millApiModuleName)
       .map(baseModule =>
-        ClassInheritorsSearch.search(baseModule, buildScope, true).findAll().asScala.toList
+        ClassInheritorsSearch.search(baseModule, buildScope, true)
+          .findAll().asScala.toList
+          .collect:
+            case s : ScTrait => s
+            case c : ScClass => c
       )
   )
 end searchForOverridableTraits
