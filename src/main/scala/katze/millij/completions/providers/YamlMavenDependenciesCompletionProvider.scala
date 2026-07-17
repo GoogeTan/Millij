@@ -4,12 +4,12 @@ import com.intellij.codeInsight.completion.*
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
 import katze.millij.*
-import katze.millij.annotator.isMvnDependency
 import katze.millij.completions.cool.CoolCompletionProvider
 import katze.millij.cool.CoolPattern
 import katze.millij.data.{MavenDependencyShared, Smart}
 import katze.millij.place.*
 import katze.millij.psi.{CompletionPosition, PsiChild}
+import katze.millij.scalatypes.isMvnDependency
 import org.jetbrains.yaml.psi.*
 
 /**

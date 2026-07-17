@@ -8,14 +8,10 @@ import katze.millij.completions.providers.yamlMavenDependenciesPattern
 import katze.millij.data.Smart
 import katze.millij.place.{PlaceInYamlConfig, richPlaceOf}
 import katze.millij.psi.{PsiChild, YAMLExactlyValue}
+import katze.millij.scalatypes.isMvnDependency
 import org.jetbrains.plugins.scala.lang.psi.types.{ScType, ScTypeExt}
 import org.jetbrains.yaml.psi.{YAMLPsiElement, YAMLScalar}
 
-def isMvnDependency(tie : ScType) : Boolean =
-  tie
-    .extractClass
-    .exists(InheritanceUtil.isInheritor(_, "mill.javalib.Dep"))
-end isMvnDependency
 
 /**
  * Annotates maven dependency strings(e.g. in mvnDeps blocks).

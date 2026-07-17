@@ -2,7 +2,7 @@ package katze.millij.place
 
 import cats.*
 import cats.syntax.all.*
-import katze.millij.annotator.isMvnDependency
+import katze.millij.scalatypes.isMvnDependency
 import katze.millij.data.module.NamespacedPath
 import katze.millij.data.{ScalaIdentifier, SegmentedPath, Smart}
 import org.jetbrains.plugins.scala.lang.psi.types.ScType

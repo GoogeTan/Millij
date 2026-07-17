@@ -7,6 +7,7 @@ import katze.millij.cool.{CoolPattern, PsiElementMatcher, PsiParentElementMatche
 import katze.millij.data.MillijBundle
 import katze.millij.place.*
 import katze.millij.psi.*
+import katze.millij.scalatypes.isMvnDependency
 import org.jetbrains.yaml.psi.*
 
 final class SmartMillYamlAnnotators extends SmartAnnotators(
