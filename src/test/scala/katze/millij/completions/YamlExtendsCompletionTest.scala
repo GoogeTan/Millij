@@ -30,7 +30,39 @@ class YamlExtendsCompletionTest extends BasePlatformTestCase:
     val lookupStrings = lookupElements.map(_.getLookupString).toList
     assertTrue("Expected 'extends' to be in completion list", lookupStrings.contains("extends"))
   end testExtendsKeywordCompletion
-
+  
+  def testExtendsKeywordInKeyPositionCompletion(): Unit =
+    myFixture.configureByText(
+      "build.mill.yaml",
+      """
+        |object A:
+        |  scalaVersion: "2.13.11"
+        |  ext<caret>: []
+        |""".stripMargin
+    )
+    val lookupElements = myFixture.completeBasic()
+    assertNotNull("Lookup elements should not be null", lookupElements)
+    val lookupStrings = lookupElements.map(_.getLookupString).toList
+    assertTrue("Expected 'extends' to be in completion list", lookupStrings.contains("extends"))
+  end testExtendsKeywordInKeyPositionCompletion
+  
+  def testNoExtendsKeywordCompletionWhenExtendsIsPresent(): Unit =
+    myFixture.configureByText(
+      "build.mill.yaml",
+      """
+        |object A:
+        |  scalaVersion: "2.13.11"
+        |  extends: []
+        |  ext<caret>
+        |""".stripMargin
+    )
+    val lookupElements = myFixture.completeBasic()
+    assertTrue(
+      s"Lookup elements should be null or empty.", 
+      lookupElements == null || lookupElements.isEmpty
+    )
+  end testNoExtendsKeywordCompletionWhenExtendsIsPresent
+  
   def testExtendsListCompletion(): Unit =
     myFixture.configureByText(
       "build.mill.yaml",

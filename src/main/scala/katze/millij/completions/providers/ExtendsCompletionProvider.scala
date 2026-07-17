@@ -206,24 +206,26 @@ def extendsExistingKeyCompletionProvider : CoolCompletionProvider[
   case (
     parameters: CompletionParameters,
     element: CompletionPosition,
-    _,
+    (_, mapping, _),
     context : ProcessingContext,
     resultSet: CompletionResultSet
   ) =>
-    val lookupElement = LookupElementBuilder
-      .create("extends")
-      .withPresentableText("extends")
-      .withTypeText("classes to extend")
-      .withInsertHandler(YamlKeyInsertHandler)
-
-    resultSet.addElement(
-      LookupElementBuilder
+    if mapping.getKeyValueByKey("extends") == null then
+      val lookupElement = LookupElementBuilder
         .create("extends")
-        .withPresentableText("extends: []")
-        .withInsertHandler(ExtendsArrayInsertHandler)
-    )
-
-    resultSet.addElement(lookupElement)
+        .withPresentableText("extends")
+        .withTypeText("classes to extend")
+        .withInsertHandler(YamlKeyInsertHandler)
+  
+      resultSet.addElement(
+        LookupElementBuilder
+          .create("extends")
+          .withPresentableText("extends: []")
+          .withInsertHandler(ExtendsArrayInsertHandler)
+      )
+  
+      resultSet.addElement(lookupElement)
+    end if
 end extendsExistingKeyCompletionProvider
 
 /**
@@ -247,16 +249,18 @@ def extendsNewKeyCompletionProvider : CoolCompletionProvider[
     context : ProcessingContext,
     resultSet: CompletionResultSet
   ) =>
-    resultSet.addElement(
-      LookupElementBuilder
-        .create("extends")
-        .withPresentableText("extends")
-        .withInsertHandler(insert.YamlKeyInsertHandler)
-    )
-    resultSet.addElement(
-      LookupElementBuilder
-        .create("extends")
-        .withPresentableText("extends: []")
-        .withInsertHandler(ExtendsArrayInsertHandler)
-    )
+    if mapping.getKeyValueByKey("extends") == null then
+      resultSet.addElement(
+        LookupElementBuilder
+          .create("extends")
+          .withPresentableText("extends")
+          .withInsertHandler(insert.YamlKeyInsertHandler)
+      )
+      resultSet.addElement(
+        LookupElementBuilder
+          .create("extends")
+          .withPresentableText("extends: []")
+          .withInsertHandler(ExtendsArrayInsertHandler)
+      )
+    end if
 end extendsNewKeyCompletionProvider
