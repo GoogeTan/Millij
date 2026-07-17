@@ -5,8 +5,11 @@ import com.intellij.execution.configurations.{GeneralCommandLine, PathEnvironmen
 import com.intellij.execution.process.OSProcessHandler
 import com.intellij.notification.{NotificationGroupManager, NotificationType}
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
+import com.intellij.openapi.externalSystem.model.ProjectSystemId
+import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
 import com.intellij.openapi.progress.{ProgressIndicator, ProgressManager, Task}
-import com.intellij.openapi.project.{Project, ProjectManager}
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.{VfsUtil, VirtualFile}
 
 object MillRunner:
@@ -25,7 +28,8 @@ object MillRunner:
     val localPath = baseDir.toNioPath.resolve("mill").toFile
     val localMill = Option.when(localPath.exists() && localPath.canExecute)(localPath.getAbsolutePath)
     lazy val globalMill = Option(PathEnvironmentVariableUtil.findInPath("mill")).map(_.getAbsolutePath)
-    localMill.orElse(globalMill)
+
+    localMill <+> globalMill
   end findMillExecutable
 
   private def executeMill(millExe: String, project: Project, baseDir: VirtualFile): Unit =
@@ -33,15 +37,50 @@ object MillRunner:
       val cmd = GeneralCommandLine(millExe, "mill.bsp.BSP/install")
       cmd.setWorkDirectory(baseDir.getPath)
       val handler = OSProcessHandler(cmd)
+
+      // 1. Initialize the Sync tool window integration
+      val buildId = new Object()
+      val syncViewManager = project.getService(classOf[com.intellij.build.SyncViewManager])
+      val buildDescriptor = com.intellij.build.DefaultBuildDescriptor(
+        buildId,
+        "Mill BSP Setup",
+        baseDir.getPath,
+        System.currentTimeMillis()
+      )
+
+      // Notify the IDE that a sync process has started
+      syncViewManager.onEvent(buildId, com.intellij.build.events.impl.StartBuildEventImpl(buildDescriptor, "Installing Mill BSP..."))
+
+      // 2. Intercept process output and pipe it to the Sync view
+      handler.addProcessListener(new com.intellij.execution.process.ProcessAdapter:
+        override def onTextAvailable(event: com.intellij.execution.process.ProcessEvent, outputType: com.intellij.openapi.util.Key[?]): Unit =
+          val isStdOut = outputType == com.intellij.execution.process.ProcessOutputTypes.STDOUT
+          // This streams the CLI text directly into the Build tool window console
+          syncViewManager.onEvent(buildId, com.intellij.build.events.impl.OutputBuildEventImpl(buildId, event.getText, isStdOut))
+      )
+
       handler.startNotify()
       handler.waitFor()
 
+      // 3. Mark the sync process as finished (Success or Failure)
       if handler.getExitCode == 0 then
+        syncViewManager.onEvent(buildId, com.intellij.build.events.impl.FinishBuildEventImpl(
+          buildId, null, System.currentTimeMillis(), "Success", com.intellij.build.events.impl.SuccessResultImpl()
+        ))
+
         VfsUtil.markDirtyAndRefresh(false, true, true, baseDir)
-        ApplicationManager.getApplication.invokeLater(() =>
-          ProjectManager.getInstance().reloadProject(project)
-        )
+        ApplicationManager.getApplication.invokeLater: () =>
+          val bspId = ProjectSystemId("BSP")
+          val importSpec = ImportSpecBuilder(project, bspId).build()
+
+          ExternalSystemUtil.refreshProject(
+            baseDir.getPath,
+            importSpec
+          )
       else
+        syncViewManager.onEvent(buildId, com.intellij.build.events.impl.FinishBuildEventImpl(
+          buildId, null, System.currentTimeMillis(), "Failed", com.intellij.build.events.impl.FailureResultImpl()
+        ))
         reportError(project, s"Mill BSP installation failed with exit code: ${handler.getExitCode}")
     catch
       case e: Exception =>
