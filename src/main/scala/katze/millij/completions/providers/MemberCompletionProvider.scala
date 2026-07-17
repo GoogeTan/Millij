@@ -1,6 +1,5 @@
 package katze.millij.completions.providers
 
-import cats.syntax.all.*
 import com.intellij.codeInsight.completion.{CompletionParameters, CompletionResultSet}
 import com.intellij.codeInsight.lookup.{LookupElement, LookupElementBuilder}
 import com.intellij.icons.AllIcons
@@ -11,14 +10,10 @@ import katze.millij.data.Smart
 import katze.millij.place.{richPlaceOf, yamlDefinableMembersOfScope}
 import katze.millij.psi.CompletionPosition
 import katze.millij.scalatypes.{termSignatureType, unwrapMillTask}
-import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil.inNameContext
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScTemplateDefinition}
-import org.jetbrains.plugins.scala.lang.psi.types.result.Failure
-import org.jetbrains.yaml.psi.YAMLPsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAliasDefinition
-import org.jetbrains.plugins.scala.lang.psi.types.{AliasType, ScType, ScTypeExt, TermSignature, TypePresentationContext}
+import org.jetbrains.plugins.scala.lang.psi.types.{AliasType, ScType, TermSignature, TypePresentationContext}
 import org.jetbrains.plugins.scala.project.ProjectContext
+import org.jetbrains.yaml.psi.YAMLPsiElement
 
 /**
  * Adds completions for module members and object params.
