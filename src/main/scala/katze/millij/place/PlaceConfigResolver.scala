@@ -2,13 +2,12 @@ package katze.millij.place
 
 import cats.*
 import cats.syntax.all.*
-import katze.millij.scalatypes.isMvnDependency
+import katze.millij.scalatypes.{isMvnDependency, ScMapType}
 import katze.millij.data.module.NamespacedPath
 import katze.millij.data.{ScalaIdentifier, SegmentedPath, Smart}
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.project.ProjectContext
 import org.jetbrains.yaml.psi.{YAMLMapping, YAMLPsiElement}
-
 import scala.jdk.CollectionConverters.*
 
 final class PlaceConfigResolver[F[_] : Applicative](
@@ -25,6 +24,8 @@ final class PlaceConfigResolver[F[_] : Applicative](
     scope match
       case PlaceInYamlConfig.Member(_, expectedType, _) if isMvnDependency(expectedType) =>
         scope.pure
+      case PlaceInYamlConfig.Member(_, ScMapType(_, valueType), _) =>
+        PlaceInYamlConfig.Member(name, valueType, Nil).pure[F]
       case _ =>  
         memberPlace(scope, name).fold(fieldNotFound(name, scope))(_.pure[F])
   end field

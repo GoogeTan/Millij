@@ -7,7 +7,7 @@ import katze.millij.data.{MillijBundle, Smart}
 import katze.millij.place
 import katze.millij.place.PlaceInYamlConfig.{Member, Module}
 import katze.millij.place.{PlaceInYamlConfig, richPlaceOf, yamlDefinableMembersOfScope}
-import katze.millij.scalatypes.isMvnDependency
+import katze.millij.scalatypes.{ScMapType, isMvnDependency}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScType, ScTypeExt, TypePresentationContext}
 import org.jetbrains.plugins.scala.project.ProjectContext
 import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping}
@@ -17,6 +17,8 @@ def unexistingMembersError(mapping : YAMLMapping, kv : YAMLKeyValue)(using Smart
   richPlaceOf(mapping).toOption.flatMap(scope =>
     scope match
       case Member(_, expectedType, _) if isMvnDependency(expectedType) =>
+        None
+      case Member(_, ScMapType(_, _), _) =>
         None
       case _ =>
         val possibleMembers = yamlDefinableMembersOfScope(scope)
