@@ -15,7 +15,7 @@ final class SmartYamlCompletionContributor extends SmartCoolCompletionContributo
   val logger: Logger = Logger.getInstance(classOf[SmartYamlCompletionContributor])
   
   coolExtendSmart(
-    CompletionType.SMART,
+    CompletionType.BASIC,
     scalaExtendsValueCompletionProvider,
     _
       .withLanguage(YAMLLanguage.INSTANCE)
@@ -27,7 +27,7 @@ final class SmartYamlCompletionContributor extends SmartCoolCompletionContributo
   )
 
   coolExtendSmart(
-    CompletionType.SMART,
+    CompletionType.BASIC,
     yamlExtendsValueCompletionProvider,
     _
       .withLanguage(YAMLLanguage.INSTANCE)
@@ -39,7 +39,7 @@ final class SmartYamlCompletionContributor extends SmartCoolCompletionContributo
   )
 
   coolExtendSmart(
-    CompletionType.SMART,
+    CompletionType.BASIC,
     scalaExtendsListCompletionProvider,
     _
       .withLanguage(YAMLLanguage.INSTANCE)
@@ -51,7 +51,7 @@ final class SmartYamlCompletionContributor extends SmartCoolCompletionContributo
   )
 
   coolExtendSmart(
-    CompletionType.SMART,
+    CompletionType.BASIC,
     yamlExtendsListCompletionProvider,
     _
       .withLanguage(YAMLLanguage.INSTANCE)
@@ -63,7 +63,7 @@ final class SmartYamlCompletionContributor extends SmartCoolCompletionContributo
   )
 
   coolExtendSmart(
-    CompletionType.SMART,
+    CompletionType.BASIC,
     memberCompletionProvider(logger),
     _
       .withLanguage(YAMLLanguage.INSTANCE)
@@ -75,7 +75,7 @@ final class SmartYamlCompletionContributor extends SmartCoolCompletionContributo
   )
 
   patternExtendSmart(
-    CompletionType.SMART,
+    CompletionType.BASIC,
     CoolPattern.elementAndParent[CompletionPosition, YAMLPsiElement]() :* yamlMavenDependenciesPattern,
     _
       .withLanguage(YAMLLanguage.INSTANCE)

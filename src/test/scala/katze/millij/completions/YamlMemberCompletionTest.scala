@@ -26,7 +26,7 @@ class YamlMemberCompletionTest extends BasePlatformTestCase:
         |<caret>
         |""".stripMargin
     )
-    val lookupElements = myFixture.complete(CompletionType.SMART)
+    val lookupElements = myFixture.complete(CompletionType.BASIC)
     assertNotNull("Lookup elements should not be null", lookupElements)
     lookupElements.find(_.getLookupString == "somethingWithTask") match
       case Some(elementFound) =>
@@ -47,7 +47,7 @@ class YamlMemberCompletionTest extends BasePlatformTestCase:
         |  <caret>
         |""".stripMargin
     )
-    val lookupElements = myFixture.complete(CompletionType.SMART)
+    val lookupElements = myFixture.complete(CompletionType.BASIC)
     assertEquals(3, lookupElements.length)
     assertNotNull("Lookup elements should not be null", lookupElements)
     val sortedLookupStrings = lookupElements.map(_.getLookupString).sorted
@@ -68,7 +68,7 @@ class YamlMemberCompletionTest extends BasePlatformTestCase:
         |  <caret>
         |""".stripMargin
     )
-    val lookupElements = myFixture.complete(CompletionType.SMART)
+    val lookupElements = myFixture.complete(CompletionType.BASIC)
     assertEquals(2, lookupElements.length)
     assertNotNull("Lookup elements should not be null", lookupElements)
     val sortedLookupStrings = lookupElements.map(_.getLookupString).sorted
@@ -88,7 +88,7 @@ class YamlMemberCompletionTest extends BasePlatformTestCase:
         |  - <caret>
         |""".stripMargin
     )
-    val lookupElements = myFixture.complete(CompletionType.SMART)
+    val lookupElements = myFixture.complete(CompletionType.BASIC)
     assertEquals(3, lookupElements.length)
     assertNotNull("Lookup elements should not be null", lookupElements)
     val sortedLookupStrings = lookupElements.map(_.getLookupString).sorted
@@ -110,7 +110,7 @@ class YamlMemberCompletionTest extends BasePlatformTestCase:
         |     <caret>
         |""".stripMargin
     )
-    val lookupElements = myFixture.complete(CompletionType.SMART)
+    val lookupElements = myFixture.complete(CompletionType.BASIC)
     assertEquals(3, lookupElements.length)
     assertNotNull("Lookup elements should not be null", lookupElements)
     val sortedLookupStrings = lookupElements.map(_.getLookupString).sorted
@@ -132,7 +132,7 @@ class YamlMemberCompletionTest extends BasePlatformTestCase:
         |   <caret>
         |""".stripMargin
     )
-    val lookupElements = myFixture.complete(CompletionType.SMART)
+    val lookupElements = myFixture.complete(CompletionType.BASIC)
     assertNotNull("Lookup elements should not be null", lookupElements)
     assertEquals(3, lookupElements.length)
     val sortedLookupStrings = lookupElements.map(_.getLookupString).sorted
@@ -161,7 +161,7 @@ class YamlMemberCompletionTest extends BasePlatformTestCase:
         |""".stripMargin
     )
     myFixture.configureFromExistingVirtualFile(coreFile.getVirtualFile)
-    val lookupElements = myFixture.complete(CompletionType.SMART)
+    val lookupElements = myFixture.complete(CompletionType.BASIC)
     assertNotNull("Lookup elements should not be null", lookupElements)
     assertEquals(2, lookupElements.length)
     val elementFound = lookupElements.head

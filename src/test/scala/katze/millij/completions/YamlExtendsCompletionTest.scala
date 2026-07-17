@@ -38,7 +38,7 @@ class YamlExtendsCompletionTest extends BasePlatformTestCase:
         |extends: [Sbt<caret>]
         |""".stripMargin
     )
-    val lookupElements = myFixture.complete(CompletionType.SMART)
+    val lookupElements = myFixture.complete(CompletionType.BASIC)
     assertNotNull("Lookup elements should not be null", lookupElements)
     val lookupStrings = lookupElements.map(_.getLookupString).toList
     assertTrue("Expected 'SbtModule' to be in completion list", lookupStrings.contains("SbtModule"))
@@ -52,7 +52,7 @@ class YamlExtendsCompletionTest extends BasePlatformTestCase:
         |extends: Sbt<caret>
         |""".stripMargin
     )
-    val lookupElements = myFixture.complete(CompletionType.SMART)
+    val lookupElements = myFixture.complete(CompletionType.BASIC)
     assertNotNull("Lookup elements should not be null", lookupElements)
     val lookupStrings = lookupElements.map(_.getLookupString).toList
     assertTrue("Expected 'SbtModule' to be in completion list", lookupStrings.contains("SbtModule"))
@@ -70,7 +70,7 @@ class YamlExtendsCompletionTest extends BasePlatformTestCase:
         | extends: Sbt<caret>
         |""".stripMargin
     )
-    val lookupElements = myFixture.complete(CompletionType.SMART)
+    val lookupElements = myFixture.complete(CompletionType.BASIC)
     assertNotNull("Lookup elements should not be null", lookupElements)
     val lookupStrings = lookupElements.map(_.getLookupString).toList
     assertTrue("Expected 'SbtTests' to be in completion list", lookupStrings.contains("SbtTests"))
@@ -88,7 +88,7 @@ class YamlExtendsCompletionTest extends BasePlatformTestCase:
         | extends: build.<caret>
         |""".stripMargin
     )
-    val lookupElements = myFixture.complete(CompletionType.SMART)
+    val lookupElements = myFixture.complete(CompletionType.BASIC)
     assertNotNull("Lookup elements should not be null", lookupElements)
     val lookupStrings = lookupElements.map(_.getLookupString).toList
     assertTrue("Expected 'SbtTests' to be in completion list", lookupStrings.contains("SbtTests"))
@@ -105,7 +105,7 @@ class YamlExtendsCompletionTest extends BasePlatformTestCase:
         | extends: A.<caret>
         |""".stripMargin
     )
-    val lookupElements = myFixture.complete(CompletionType.SMART)
+    val lookupElements = myFixture.complete(CompletionType.BASIC)
     assertNotNull("Lookup elements should not be null", lookupElements)
     val lookupStrings = lookupElements.map(_.getLookupString).toList
     assertTrue("Expected 'A.SbtTests' to be in completion list", lookupStrings.contains("A.SbtTests"))
@@ -123,7 +123,7 @@ class YamlExtendsCompletionTest extends BasePlatformTestCase:
         | extends: build.A.<caret>
         |""".stripMargin
     )
-    val lookupElements = myFixture.complete(CompletionType.SMART)
+    val lookupElements = myFixture.complete(CompletionType.BASIC)
     assertNotNull("Lookup elements should not be null", lookupElements)
     val lookupStrings = lookupElements.map(_.getLookupString).toList
     assertTrue("Expected 'A.SbtTests' to be in completion list", lookupStrings.contains("A.SbtTests"))
