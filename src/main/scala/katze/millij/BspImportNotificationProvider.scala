@@ -9,9 +9,7 @@ import katze.millij.externalSystem.MillRunner
 import java.util.function.Function
 import javax.swing.JComponent
 
-//TODO сделать так, чтобы не требовался перезапуск всей IDE для реимпорта
 final class BspImportNotificationProvider extends EditorNotificationProvider:
-
   override def collectNotificationData(
     project: Project,
     file: VirtualFile
