@@ -2,7 +2,13 @@
 
 This project adds IDE features specific to [mill build tool](https://github.com/com-lihaoyi/mill) including but not limited to YAML configs.
 
-![Build](https://github.com/GoogeTan/mill-project-templates/workflows/Build/badge.svg)
+Feature list:
+- Mill project wizard for scala, kotlin and java projects
+- Highlighting, autocompletion, reference resolution and type hints for .mill.yaml configs
+- Adds tasks as run/debug configurations
+- Tasks are now accessible from BSP tool window
+
+![Build](https://github.com/GoogeTan/Millij/workflows/Build/badge.svg)
 [![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
 
