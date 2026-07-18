@@ -30,6 +30,7 @@ dependencies {
         bundledPlugin("com.intellij.java")
         bundledPlugin("org.jetbrains.kotlin")
         bundledPlugin("org.jetbrains.idea.maven")
+        bundledPlugin("org.jetbrains.idea.reposearch")
         testFramework(TestFrameworkType.Platform)
         testFramework(TestFrameworkType.Plugin.Java)
         bundledPlugin("org.jetbrains.plugins.yaml")
@@ -39,21 +40,14 @@ dependencies {
 // Configure IntelliJ Platform Gradle Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-extension.html
 intellijPlatform {
     pluginConfiguration {
-        // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
-        /*description = providers.fileContents(layout.projectDirectory.file("README.md")).asText.map {
-            val start = "<!-- Plugin description -->"
-            val end = "<!-- Plugin description end -->"
+        version.set(project.version.toString())
 
-            with(it.lines()) {
-                if (!containsAll(listOf(start, end))) {
-                    throw GradleException("Plugin description section not found in README.md:\n$start ... $end")
-                }
-                subList(indexOf(start) + 1, indexOf(end)).joinToString("\n").let(::markdownToHTML)
-            }
-        }*/
+        ideaVersion {
+            sinceBuild.set("261")
+            untilBuild.set("263.*")
+        }
 
-        val changelog = project.changelog // local variable for configuration cache compatibility
-        // Get the latest available change notes from the changelog file
+        val changelog = project.changelog
         changeNotes = version.map { pluginVersion ->
             with(changelog) {
                 renderItem(
@@ -63,6 +57,12 @@ intellijPlatform {
                     Changelog.OutputType.HTML,
                 )
             }
+        }
+    }
+
+    pluginVerification {
+        ides {
+            current()
         }
     }
 }
