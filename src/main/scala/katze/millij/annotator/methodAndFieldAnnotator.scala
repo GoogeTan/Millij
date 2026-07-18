@@ -21,10 +21,10 @@ def unexistingMembersAnnotator(
       checkIfItIsACorrectMember(mapping, keyValue).foreach(
         error =>
           annotationHolder
-            .newSilentAnnotation(
+            .newAnnotation(
               HighlightSeverity.ERROR,
+              error
             )
-            .tooltip(error)
             .highlightType(ProblemHighlightType.LIKE_UNKNOWN_SYMBOL)
             .range(element)
             .create()

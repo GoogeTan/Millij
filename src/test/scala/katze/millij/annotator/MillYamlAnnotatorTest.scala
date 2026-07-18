@@ -127,4 +127,25 @@ class MillYamlAnnotatorTest extends BasePlatformTestCase:
     )
     myFixture.checkHighlighting(false, true, false)
   end testCyclicModuleDependenciesErrorHighlighting
+  
+  def testMapKeysGenerateNoError(): Unit =
+    myFixture.configureByText(
+      "build.mill.yaml",
+      """
+        |extends: SbtModule2
+        |<info descr="null" textAttributesKey="MILL_YAML_MODULE_MEMBER">dict</info>:
+        | <info descr="null" textAttributesKey="MILL_YAML_NAMED_ARGUMENT">ENV_A</info>: 
+        |   <info descr="null" textAttributesKey="MILL_YAML_NAMED_ARGUMENT">a</info>: 1
+        |   <info descr="null" textAttributesKey="MILL_YAML_NAMED_ARGUMENT">b</info>: 2
+        |   <info descr="null" textAttributesKey="MILL_YAML_NAMED_ARGUMENT">c</info>: 3
+        |   
+        | <info descr="null" textAttributesKey="MILL_YAML_NAMED_ARGUMENT">ENV_C</info>: 
+        |   <info descr="null" textAttributesKey="MILL_YAML_NAMED_ARGUMENT">a</info>: 4
+        |   <info descr="null" textAttributesKey="MILL_YAML_NAMED_ARGUMENT">b</info>: 5
+        |   <info descr="null" textAttributesKey="MILL_YAML_NAMED_ARGUMENT">c</info>: 6
+        |   <error descr="Could not find member with name d to override in object of type <a href=\"#goto/mill.api.TestStruct\">TestStruct</a>" textAttributesKey="WRONG_REFERENCES_ATTRIBUTES"><info descr="null" textAttributesKey="MILL_YAML_NAMED_ARGUMENT">d</info></error>: 6
+        |""".stripMargin
+    )
+    myFixture.checkHighlighting(false, true, false)
+  end testMapKeysGenerateNoError
 end MillYamlAnnotatorTest
