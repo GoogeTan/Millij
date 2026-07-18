@@ -11,7 +11,7 @@ import com.intellij.openapi.vfs.{VfsUtilCore, VirtualFile, VirtualFileVisitor}
 import java.util
 import scala.jdk.CollectionConverters.*
 
-final class MillBspProjectAware(project: Project) extends ExternalSystemProjectAware:
+final class MillBspProjectAware(project: Project) extends AbstractMillBspProjectAware:
 
   private val listeners = new java.util.concurrent.CopyOnWriteArrayList[ExternalSystemProjectListener]()
 
