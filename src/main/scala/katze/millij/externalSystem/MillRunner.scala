@@ -1,8 +1,9 @@
 package katze.millij.externalSystem
 
 import cats.syntax.all.*
+import com.intellij.build.events.{StartBuildEvent, OutputBuildEvent, FinishBuildEvent, SuccessResult, FailureResult, Warning, Failure}
 import com.intellij.execution.configurations.{GeneralCommandLine, PathEnvironmentVariableUtil}
-import com.intellij.execution.process.OSProcessHandler
+import com.intellij.execution.process.{OSProcessHandler, ProcessListener, ProcessOutputType}
 import com.intellij.notification.{NotificationGroupManager, NotificationType}
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
@@ -11,6 +12,7 @@ import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
 import com.intellij.openapi.progress.{ProgressIndicator, ProgressManager, Task}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.{VfsUtil, VirtualFile}
+import java.util.Collections
 
 object MillRunner:
 
@@ -62,14 +64,19 @@ object MillRunner:
       )
 
       // Notify the IDE that a sync process has started
-      syncViewManager.onEvent(buildId, com.intellij.build.events.impl.StartBuildEventImpl(buildDescriptor, "Installing Mill BSP..."))
+      val startEvent = StartBuildEvent.builder(buildId.toString, buildDescriptor).build()
+      syncViewManager.onEvent(buildId, startEvent)
 
       // 2. Intercept process output and pipe it to the Sync view
-      handler.addProcessListener(new com.intellij.execution.process.ProcessAdapter:
+      handler.addProcessListener(new ProcessListener:
         override def onTextAvailable(event: com.intellij.execution.process.ProcessEvent, outputType: com.intellij.openapi.util.Key[?]): Unit =
-          val isStdOut = outputType == com.intellij.execution.process.ProcessOutputTypes.STDOUT
+          val processOutputType = outputType.asInstanceOf[ProcessOutputType]
           // This streams the CLI text directly into the Build tool window console
-          syncViewManager.onEvent(buildId, com.intellij.build.events.impl.OutputBuildEventImpl(buildId, event.getText, isStdOut))
+          val outputEvent = OutputBuildEvent.builder(event.getText)
+            .withParentId(buildId)
+            .withOutputType(processOutputType)
+            .build()
+          syncViewManager.onEvent(buildId, outputEvent)
       )
 
       handler.startNotify()
@@ -77,9 +84,16 @@ object MillRunner:
 
       // 3. Mark the sync process as finished (Success or Failure)
       if handler.getExitCode == 0 then
-        syncViewManager.onEvent(buildId, com.intellij.build.events.impl.FinishBuildEventImpl(
-          buildId, null, System.currentTimeMillis(), "Success", com.intellij.build.events.impl.SuccessResultImpl()
-        ))
+        val successResult = new SuccessResult:
+          override def isUpToDate: Boolean = false
+          override def getWarnings: java.util.List[? <: Warning] = Collections.emptyList()
+
+        val finishEvent = FinishBuildEvent.builder(
+          buildId,
+          "Success",
+          successResult
+        ).build()
+        syncViewManager.onEvent(buildId, finishEvent)
 
         VfsUtil.markDirtyAndRefresh(false, true, true, baseDir)
         ApplicationManager.getApplication.invokeLater: () =>
@@ -92,9 +106,15 @@ object MillRunner:
           )
           onFinishedCallback.foreach(_(true))
       else
-        syncViewManager.onEvent(buildId, com.intellij.build.events.impl.FinishBuildEventImpl(
-          buildId, null, System.currentTimeMillis(), "Failed", com.intellij.build.events.impl.FailureResultImpl()
-        ))
+        val failureResult = new FailureResult:
+          override def getFailures: java.util.List[? <: Failure] = Collections.emptyList()
+
+        val finishEvent = FinishBuildEvent.builder(
+          buildId,
+          "Failed",
+          failureResult
+        ).build()
+        syncViewManager.onEvent(buildId, finishEvent)
         reportError(project, s"Mill BSP installation failed with exit code: ${handler.getExitCode}")
         onFinishedCallback.foreach(_(false))
     catch
