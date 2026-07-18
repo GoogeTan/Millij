@@ -1,12 +1,19 @@
 package katze.millij.wizard
 
 import com.intellij.ide.wizard.{AbstractNewProjectWizardStep, NewProjectWizardStep}
+import com.intellij.openapi.progress.{ProgressIndicator, ProgressManager, Task}
 import com.intellij.openapi.project.Project
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Panel
+import katze.millij.externalSystem.MillRunner
 import org.jetbrains.sbt.project.template.wizard.ScalaNewProjectWizardMultiStep
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.util.SystemInfo
+import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.util.io.HttpRequests
+import katze.millij.wizard.MillNewProjectWizardStep.Log
 
-import java.nio.file.Files
+import java.nio.file.{Files, Path}
 import javax.swing.{ButtonGroup, JRadioButton}
 
 trait MillLanguageConfigurator:
@@ -64,13 +71,61 @@ final class MillNewProjectWizardStep(
     else
       "build.mill.yaml"
     generateMillBuildFile(projectDir, configFilename)
+
+    ProgressManager.getInstance().run(
+      new Task.Backgroundable(project, "Setting up Mill project...", false):
+        override def run(indicator: ProgressIndicator): Unit =
+          if downloadMill(projectDir, indicator) then
+            val virtualFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(projectDir)
+            if virtualFile != null then
+              MillRunner.installAndRefreshBsp(project, virtualFile)
+            else
+              Log.error("Project directory not found in Virtual File System after downloading Mill")
+          else
+            Log.error("Failed to download Mill scripts")
+    )
   end setupProject
 
-  private def generateMillBuildFile(dir: java.nio.file.Path, configFilename: String): Unit =
+  private def generateMillBuildFile(dir: Path, configFilename: String): Unit =
     val millVersion = millVersionField.getText
     val isYaml = buildYamlRadio.isSelected
     val configText = language.generateConfig(isYaml)
     Files.writeString(dir.resolve(configFilename), configText)
     Files.writeString(dir.resolve(".mill-version"), millVersion)
   end generateMillBuildFile
+
+  def downloadMill(targetDir: Path, indicator: ProgressIndicator): Boolean =
+    val millVersion = millVersionField.getText
+    val baseUrl = s"https://repo1.maven.org/maven2/com/lihaoyi/mill-dist/$millVersion"
+    
+    val shRemote = s"mill-dist-$millVersion-mill.sh"
+    val batRemote = s"mill-dist-$millVersion-mill.bat"
+    
+    val shLocal = targetDir.resolve("mill").toFile
+    val batLocal = targetDir.resolve("mill.bat").toFile
+
+    try
+      indicator.setText(s"Downloading Mill $millVersion scripts...")
+      indicator.setIndeterminate(false)
+
+      indicator.setText2("Downloading mill script...")
+      HttpRequests.request(s"$baseUrl/$shRemote")
+        .productNameAsUserAgent()
+        .saveToFile(shLocal, indicator)
+      shLocal.setExecutable(true, false)
+
+      indicator.setText2("Downloading mill.bat script...")
+      HttpRequests.request(s"$baseUrl/$batRemote")
+        .productNameAsUserAgent()
+        .saveToFile(batLocal, indicator)
+
+      true
+    catch
+      case e: Exception =>
+        Log.error(s"Failed to download Mill scripts", e)
+        false
+  end downloadMill
 end MillNewProjectWizardStep
+
+object MillNewProjectWizardStep:
+  private val Log = Logger.getInstance(classOf[MillNewProjectWizardStep])
