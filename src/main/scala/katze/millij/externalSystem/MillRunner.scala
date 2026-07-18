@@ -30,7 +30,7 @@ object MillRunner:
     )
   end installAndRefreshBsp
 
-  private def findMillExecutable(baseDir: VirtualFile): Option[String] =
+  def findMillExecutable(baseDir: VirtualFile): Option[String] =
     val isWin = com.intellij.openapi.util.SystemInfo.isWindows
     val name = if isWin then "mill.bat" else "mill"
     val localPath = baseDir.toNioPath.resolve(name).toFile

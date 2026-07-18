@@ -98,7 +98,9 @@ class MillModulesToolWindowFactory extends ToolWindowFactory:
       ""
 
   def executeMillCommand(projectPath: String, timeoutMs: Int = 15000): Either[String, List[String]] =
-    val cmd = new GeneralCommandLine("mill", "--no-server", "resolve", "__")
+    val baseDir = com.intellij.openapi.vfs.LocalFileSystem.getInstance().findFileByPath(projectPath)
+    val millExe = Option(baseDir).flatMap(katze.millij.externalSystem.MillRunner.findMillExecutable).getOrElse("mill")
+    val cmd = new GeneralCommandLine(millExe, "--no-server", "resolve", "__")
     cmd.setWorkDirectory(projectPath)
 
     try
