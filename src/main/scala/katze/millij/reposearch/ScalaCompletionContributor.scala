@@ -1,12 +1,12 @@
-package katze.millij.completions
+package katze.millij.reposearch
 
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.patterns.StandardPatterns.or
 import com.intellij.patterns.{PlatformPatterns, StandardPatterns}
 import katze.millij.completions.cool.CoolCompletionContributor
-import katze.millij.completions.isMavenDependencyInterpolatedStringLiteral
-import katze.millij.completions.providers.ScalaMavenDependenciesCompletionProvider
+import katze.millij.scalatypes.isMavenDependencyInterpolatedStringLiteral
 import katze.millij.psi.CompletionPosition
+import katze.millij.reposearch.ScalaMavenDependenciesCompletionProvider
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScInterpolatedStringLiteral
 import org.jetbrains.plugins.scala.{Scala3Language, ScalaLanguage}
 

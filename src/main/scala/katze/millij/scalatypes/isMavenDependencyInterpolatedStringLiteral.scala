@@ -1,4 +1,4 @@
-package katze.millij.completions
+package katze.millij.scalatypes
 
 import com.intellij.codeInsight.completion.CompletionConfidence
 import com.intellij.openapi.editor.Editor

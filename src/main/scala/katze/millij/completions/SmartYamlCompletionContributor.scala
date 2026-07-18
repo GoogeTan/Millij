@@ -73,19 +73,4 @@ final class SmartYamlCompletionContributor extends SmartCoolCompletionContributo
         )
       )
   )
-
-  patternExtendSmart(
-    CompletionType.BASIC,
-    CoolPattern.elementAndParent[CompletionPosition, YAMLPsiElement]() :* yamlMavenDependenciesPattern,
-    _
-      .withLanguage(YAMLLanguage.INSTANCE)
-      .inVirtualFile(
-        PlatformPatterns.virtualFile().withName(
-          StandardPatterns.string().endsWith(".mill.yaml")
-        )
-      ),
-  ) {
-    case ((_, parent, text), ctx, resultSet) =>
-      suggestMavenDependency(parent, text, resultSet)
-  }
 end SmartYamlCompletionContributor

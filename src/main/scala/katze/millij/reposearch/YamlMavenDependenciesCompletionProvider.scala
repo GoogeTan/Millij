@@ -1,14 +1,14 @@
-package katze.millij.completions.providers
+package katze.millij.reposearch
 
 import com.intellij.codeInsight.completion.*
 import com.intellij.psi.PsiElement
 import com.intellij.util.ProcessingContext
 import katze.millij.*
-import katze.millij.completions.cool.CoolCompletionProvider
+import katze.millij.completions.cool.{CoolCompletionProvider, SmartCoolCompletionContributor}
 import katze.millij.cool.CoolPattern
 import katze.millij.data.{MavenDependencyShared, Smart}
 import katze.millij.place.*
-import katze.millij.psi.{CompletionPosition, PsiChild}
+import katze.millij.psi.{CompletionPosition, PsiChild, cleanElementTextFromDummyIdentifier}
 import katze.millij.scalatypes.isMvnDependency
 import org.jetbrains.yaml.psi.*
 
@@ -40,11 +40,6 @@ val yamlMavenDependenciesPattern : CoolPattern[String] =
       .map((_, kv, _) => kv.getText)
   ).map(cleanElementTextFromDummyIdentifier)
 end yamlMavenDependenciesPattern
-
-def cleanElementTextFromDummyIdentifier(text: String): String =
-  text.replace(CompletionUtilCore.DUMMY_IDENTIFIER, "")
-    .replace(CompletionUtilCore.DUMMY_IDENTIFIER_TRIMMED, "")
-end cleanElementTextFromDummyIdentifier
 
 /**
  * Adds maven dependencies suggestions for YAML.

@@ -4,7 +4,7 @@ import cats.syntax.all.*
 import com.intellij.lang.annotation.{AnnotationHolder, HighlightSeverity}
 import com.intellij.psi.util.InheritanceUtil
 import com.intellij.structuralsearch.impl.matcher.handlers.AnnotationHandler
-import katze.millij.completions.providers.yamlMavenDependenciesPattern
+import katze.millij.reposearch.yamlMavenDependenciesPattern
 import katze.millij.data.Smart
 import katze.millij.place.{PlaceInYamlConfig, richPlaceOf}
 import katze.millij.psi.{PsiChild, YAMLExactlyValue}

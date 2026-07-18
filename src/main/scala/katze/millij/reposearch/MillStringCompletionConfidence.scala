@@ -1,9 +1,10 @@
-package katze.millij.completions
+package katze.millij.reposearch
 
 import com.intellij.codeInsight.completion.CompletionConfidence
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.{PsiElement, PsiFile}
 import com.intellij.util.ThreeState
+import katze.millij.scalatypes.isMavenDependencyInterpolatedStringLiteral
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScInterpolatedStringLiteral
 
 /**

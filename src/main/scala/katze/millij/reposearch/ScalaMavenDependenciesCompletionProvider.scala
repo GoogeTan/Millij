@@ -1,4 +1,4 @@
-package katze.millij.completions.providers
+package katze.millij.reposearch
 
 import com.intellij.codeInsight.completion.*
 import com.intellij.psi.PsiElement
