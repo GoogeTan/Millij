@@ -14,13 +14,19 @@ import com.intellij.openapi.vfs.{VfsUtil, VirtualFile}
 
 object MillRunner:
 
-  def installAndRefreshBsp(project: Project, baseDir: VirtualFile): Unit =
+  def installAndRefreshBsp(
+    project: Project,
+    baseDir: VirtualFile,
+    onFinishedCallback: Option[Boolean => Unit] = None
+  ): Unit =
     ProgressManager.getInstance().run(
       new Task.Backgroundable(project, "Installing Mill BSP...", false):
         override def run(indicator: ProgressIndicator): Unit =
           findMillExecutable(baseDir) match
-            case Some(millExe) => executeMill(millExe, project, baseDir)
-            case None => reportError(project, "Could not find 'mill' executable locally or globally in PATH.")
+            case Some(millExe) => executeMill(millExe, project, baseDir, onFinishedCallback)
+            case None =>
+              reportError(project, "Could not find 'mill' executable locally or globally in PATH.")
+              onFinishedCallback.foreach(_(false))
     )
   end installAndRefreshBsp
 
@@ -34,7 +40,12 @@ object MillRunner:
     localMill <+> globalMill
   end findMillExecutable
 
-  private def executeMill(millExe: String, project: Project, baseDir: VirtualFile): Unit =
+  private def executeMill(
+    millExe: String,
+    project: Project,
+    baseDir: VirtualFile,
+    onFinishedCallback: Option[Boolean => Unit]
+  ): Unit =
     try
       val cmd = GeneralCommandLine(millExe, "mill.bsp.BSP/install")
       cmd.setWorkDirectory(baseDir.getPath)
@@ -79,14 +90,17 @@ object MillRunner:
             baseDir.getPath,
             importSpec
           )
+          onFinishedCallback.foreach(_(true))
       else
         syncViewManager.onEvent(buildId, com.intellij.build.events.impl.FinishBuildEventImpl(
           buildId, null, System.currentTimeMillis(), "Failed", com.intellij.build.events.impl.FailureResultImpl()
         ))
         reportError(project, s"Mill BSP installation failed with exit code: ${handler.getExitCode}")
+        onFinishedCallback.foreach(_(false))
     catch
       case e: Exception =>
         reportError(project, s"Exception occurred while running Mill: ${e.getMessage}")
+        onFinishedCallback.foreach(_(false))
   end executeMill
 
   private def reportError(project: Project, message: String): Unit =

@@ -10,5 +10,6 @@ final class MillProjectStartupActivity extends StartupActivity.DumbAware:
     val tracker = ExternalSystemProjectTracker.getInstance(project)
     val aware = MillBspProjectAware(project)
     tracker.register(aware)
+    tracker.activate(aware.getProjectId)
   end runActivity
 end MillProjectStartupActivity
