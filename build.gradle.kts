@@ -29,7 +29,6 @@ dependencies {
         plugin("org.intellij.scala", "2026.1.16")
         bundledPlugin("com.intellij.java")
         bundledPlugin("org.jetbrains.kotlin")
-        bundledPlugin("org.jetbrains.idea.maven")
         bundledPlugin("org.jetbrains.idea.reposearch")
         testFramework(TestFrameworkType.Platform)
         testFramework(TestFrameworkType.Plugin.Java)

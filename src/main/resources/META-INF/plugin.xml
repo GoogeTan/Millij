@@ -15,7 +15,6 @@
     <depends>org.jetbrains.plugins.yaml</depends>
     <depends>org.intellij.scala</depends>
     <depends>com.intellij.modules.java</depends>
-    <depends>org.jetbrains.idea.maven</depends>
     <depends>org.jetbrains.idea.reposearch</depends>
     <depends optional="true" config-file="mill-kotlin-features.xml">org.jetbrains.kotlin</depends>
 
