@@ -2,7 +2,7 @@ package katze.millij.annotator
 
 import com.intellij.lang.annotation.{AnnotationHolder, HighlightSeverity}
 import katze.millij.data.module.NamespacedPath
-import katze.millij.data.{MillModuleService, ScalaIdentifier, Smart}
+import katze.millij.data.{MillModuleService, Smart}
 import katze.millij.psi.{YAMLKeyValueWithKey, YAMLMillModule}
 import katze.millij.file.*
 import katze.millij.place.*
@@ -13,7 +13,7 @@ import scala.jdk.CollectionConverters.*
 
 def extendsBlockMembersAnnotator(
   annotateScalar : (
-    enclosingMod : NamespacedPath[List, ScalaIdentifier],
+    enclosingMod : NamespacedPath[List, String],
     scalar : YAMLScalar,
     annotationHolder : AnnotationHolder, 
     isOnCycle : Boolean
