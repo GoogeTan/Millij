@@ -16,7 +16,7 @@
     <depends>org.intellij.scala</depends>
     <depends>com.intellij.modules.java</depends>
     <depends optional="true" config-file="millij-reposearch-features.xml">org.jetbrains.idea.reposearch</depends>
-    <depends optional="true" config-file="mill-kotlin-features.xml">org.jetbrains.kotlin</depends>
+    <depends optional="true" config-file="millij-kotlin-features.xml">org.jetbrains.kotlin</depends>
 
     <extensions defaultExtensionNs="org.jetbrains.kotlin">
         <supportsKotlinPluginMode supportsK2="true" />
