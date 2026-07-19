@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.externalSystem.autoimport.*
 import com.intellij.openapi.externalSystem.model.ProjectSystemId
 import com.intellij.openapi.project.{Project, ProjectUtil}
+import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.{VfsUtilCore, VirtualFile, VirtualFileVisitor}
 
@@ -27,16 +28,13 @@ final class MillBspProjectAware(project: Project) extends AbstractMillBspProject
   override def getSettingsFiles: java.util.Set[String] =
     ReadAction.computeBlocking: () =>
       val files = new util.HashSet[String]()
-      Option(ProjectUtil.guessProjectDir(project)).foreach { baseDir =>
-        VfsUtilCore.visitChildrenRecursively(baseDir,
-          new VirtualFileVisitor[Void]() {
-            override def visitFile(file: VirtualFile): Boolean =
-              if !file.isDirectory && millConfigNames.contains(file.getName) then
-                files.add(file.getPath)
-              true
-          }
-        )
-      }
+      val fileIndex = ProjectRootManager.getInstance(project).getFileIndex
+
+      fileIndex.iterateContent: (file: VirtualFile) =>
+        if !file.isDirectory && millConfigNames.contains(file.getName) then
+          files.add(file.getPath)
+        true 
+
       files
   end getSettingsFiles
 
