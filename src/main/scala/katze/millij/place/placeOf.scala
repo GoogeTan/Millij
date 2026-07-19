@@ -30,7 +30,7 @@ end isObjectDeclarationText
  * Extracts and returns the object name if the text is a correct object declaration.
  * Returns Some(name) if matched, or None otherwise.
  */
-def extractObjectName(text: String): Option[ScalaIdentifier] =
+def extractObjectName(text: String): Option[String] =
   // 1. Define the pattern as a String first (interpolating a Regex object calls .toString anyway)
   val objectNamePattern = "[a-zA-Z_$][\\w$]*"
 
@@ -40,7 +40,7 @@ def extractObjectName(text: String): Option[ScalaIdentifier] =
 
   // 3. Use pattern matching to extract the captured group
   text match
-    case objectRegex(name) => Some(ScalaIdentifier.unsafe(name))
+    case objectRegex(name) => Some(name)
     case _                 => None
 end extractObjectName
 
@@ -142,7 +142,7 @@ end richPlaceOf
 
 def richPlaceConfigResolver(
   project : Project,
-  relativePath : SegmentedPath[List, ScalaIdentifier]
+  relativePath : SegmentedPath[List, String]
 )(using Smart): PlaceConfigResolver[EitherString] =
   given ProjectContext = ProjectContext.fromProject(project)
   PlaceConfigResolver(relativePath, richPlaceSearch(project))
@@ -151,16 +151,16 @@ end richPlaceConfigResolver
 
 def richPlaceConfigResolverOption(
   project : Project,
-  relativePath : SegmentedPath[List, ScalaIdentifier]
+  relativePath : SegmentedPath[List, String]
 )(using Smart): PlaceConfigResolver[Option] =
   given ProjectContext = ProjectContext.fromProject(project)
   PlaceConfigResolver.option(relativePath, richPlaceSearch[Id](project))
 end richPlaceConfigResolverOption
 
 
-def richPlaceSearch[F[_] : Applicative](project : Project)(using Smart) = (module: NamespacedPath[List, ScalaIdentifier], name: String) =>
+def richPlaceSearch[F[_] : Applicative](project : Project)(using Smart) = (module: NamespacedPath[List, String], name: String) =>
   given ProjectContext = ProjectContext.fromProject(project)
-  ScalaSegmentedPath
+  SegmentedPath
     .fromQualifiedNonEmpty(name)
     .flatMap(
       project.getService(classOf[MillModuleService])

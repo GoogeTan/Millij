@@ -19,11 +19,11 @@ import scala.jdk.CollectionConverters.*
 
 @Service(Array(Service.Level.PROJECT))
 final class MillModuleService(project: Project):
-  val recursionGuard = RecursionManager.RecursionGuard[SegmentedPath[List, ScalaIdentifier], Nothing]("millij.type.resolution")
+  val recursionGuard = RecursionManager.RecursionGuard[SegmentedPath[List, String], Nothing]("millij.type.resolution")
 
   private val resolved = CachedValuesManager.getManager(project).createCachedValue { () =>
     CachedValueProvider.Result.create(
-      new ConcurrentHashMap[SegmentedPath[List, ScalaIdentifier], ModuleType[ScalaIdentifier]](),
+      new ConcurrentHashMap[SegmentedPath[List, String], ModuleType[String]](),
       PsiModificationTracker.MODIFICATION_COUNT,//TODO use something more specific. Like own modification counter or resolve types into descriptions(e.g. Scala sclass names, file paths and etc).
       com.intellij.openapi.roots.ProjectRootManager.getInstance(project)
     )
@@ -35,8 +35,8 @@ final class MillModuleService(project: Project):
   val service = project.getService(classOf[TypeSearchCache])
 
 
-  val resolver : ModuleTypeResolver[ScalaIdentifier] = ModuleTypeResolverImpl[ScalaIdentifier](
-    resolveScalaDependency = (path: SegmentedPath[List, ScalaIdentifier], name: ScalaIdentifier) =>
+  val resolver : ModuleTypeResolver[String] = ModuleTypeResolverImpl[String](
+    resolveScalaDependency = (path: SegmentedPath[List, String], name: String) =>
       service.searchPsiClass(path.addNonEmpty(name))
         .flatMap(ResolvedSymbol.fromPsiElement).orElse(
           service.findPackages(path.addNonEmpty(name))
@@ -46,7 +46,7 @@ final class MillModuleService(project: Project):
     resolveInTypeDependency = resolveTypeMember,
     resolvePackageMember = (psiPackage, element) =>
       resolvePackageMember(psiPackage, element, searchScope).headOption, //TODO do something with multiple options
-    buildPrefix = ScalaIdentifier.unsafe("build"),
+    buildPrefix = "build",
     findYamlModuleMapping = findYamlModuleMapping(searchScope, _),
     cacheResolvedModule = (key, f) => resolved.getValue.computeIfAbsent(key, _ => f),
     rawModuleByName = name =>
@@ -57,7 +57,7 @@ final class MillModuleService(project: Project):
         None
   )
 
-  def rawModuleByName(name : SegmentedPath[List, ScalaIdentifier]) : List[ModuleDeclaration[ScalaIdentifier]] =
+  def rawModuleByName(name : SegmentedPath[List, String]) : List[ModuleDeclaration[String]] =
     FileBasedIndex.getInstance().getValues(
       YamlModuleIndex.Name,
       name,
@@ -65,9 +65,9 @@ final class MillModuleService(project: Project):
     ).asScala.toList
   end rawModuleByName
 
-  def rawModuleByName(name : NamespacedPath[List, ScalaIdentifier]) : Option[ModuleDeclaration[ScalaIdentifier]] =
+  def rawModuleByName(name : NamespacedPath[List, String]) : Option[ModuleDeclaration[String]] =
     val moduleFileName =
-      name.namespace.map(_.toString).addNonEmpty("build.mill.yaml")
+      name.namespace.addNonEmpty("build.mill.yaml")
     virtualFileByRelativePath(
       project,
       moduleFileName
@@ -81,22 +81,22 @@ final class MillModuleService(project: Project):
         Option(found.get(name.fullPath))
   end rawModuleByName
 
-  def resolveModuleByName(name : SegmentedPath[List, ScalaIdentifier])(using Smart) : List[ModuleType[ScalaIdentifier]] =
+  def resolveModuleByName(name : SegmentedPath[List, String])(using Smart) : List[ModuleType[String]] =
     rawModuleByName(name).map(typeModule)
   end resolveModuleByName
 
-  def resolveModuleByName(name : NamespacedPath[List, ScalaIdentifier])(using Smart) : Option[ModuleType[ScalaIdentifier]] =
+  def resolveModuleByName(name : NamespacedPath[List, String])(using Smart) : Option[ModuleType[String]] =
     rawModuleByName(name).map(typeModule)
   end resolveModuleByName
 
-  def typeModule(module: ModuleDeclaration[ScalaIdentifier])(using Smart): ModuleType[ScalaIdentifier] =
+  def typeModule(module: ModuleDeclaration[String])(using Smart): ModuleType[String] =
     resolver.typeModule(module)
   end typeModule
 
   def resolvePath(
-    module : NamespacedPath[List, ScalaIdentifier],
-    path : SegmentedPath[NonEmptyList, ScalaIdentifier]
-  )(using Smart) : ResolvedPath[List, ScalaIdentifier, ResolvedSymbol[ScalaIdentifier]] =
+    module : NamespacedPath[List, String],
+    path : SegmentedPath[NonEmptyList, String]
+  )(using Smart) : ResolvedPath[List, String, ResolvedSymbol[String]] =
     resolver.resolvePath(module, path)
   end resolvePath
 end MillModuleService

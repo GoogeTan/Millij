@@ -2,19 +2,19 @@ package katze.millij.data.module
 
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.indexing.FileBasedIndex
-import katze.millij.data.{ScalaIdentifier, SegmentedPath, Smart}
+import katze.millij.data.{SegmentedPath, Smart}
 import org.jetbrains.yaml.psi.YAMLFile
 
 import scala.collection.mutable.ListBuffer
 
 private def fileByModuleName(
   scope : GlobalSearchScope,
-  path : SegmentedPath[List, ScalaIdentifier]
+  path : SegmentedPath[List, String]
 )(
   using Smart
-) : List[(ModuleDeclaration[ScalaIdentifier], YAMLFile)] =
+) : List[(ModuleDeclaration[String], YAMLFile)] =
   val index = FileBasedIndex.getInstance()
-  val results = ListBuffer.empty[(ModuleDeclaration[ScalaIdentifier], YAMLFile)]
+  val results = ListBuffer.empty[(ModuleDeclaration[String], YAMLFile)]
   val psiManager = com.intellij.psi.PsiManager.getInstance(scope.getProject)
   index.processValues(
     YamlModuleIndex.Name,

@@ -13,8 +13,8 @@ import org.jetbrains.plugins.scala.project.ProjectContext
 
 import scala.jdk.CollectionConverters.*
 
-val millApiModuleName : SegmentedPath[NonEmptyList, ScalaIdentifier] =
-  SegmentedPath.fromQualifiedNonEmpty("mill.api.Module").get.map(ScalaIdentifier.unsafe)
+val millApiModuleName : SegmentedPath[NonEmptyList, String] =
+  SegmentedPath.fromQualifiedNonEmpty("mill.api.Module").get
 
 /**
  * Finds all subtypes of mill.api.Module.
@@ -28,9 +28,9 @@ end searchForOverridableTraits
 
 //TODO cache this too
 def searchForDependentOverridableTraits(
-  context : NamespacedPath[List, ScalaIdentifier],
+  context : NamespacedPath[List, String],
   project: Project
-)(using Smart): List[(name : SegmentedPath[NonEmptyList, ScalaIdentifier], scType : ScType, psiElement : ScTrait | ScClass)] =
+)(using Smart): List[(name : SegmentedPath[NonEmptyList, String], scType : ScType, psiElement : ScTrait | ScClass)] =
   given ProjectContext = ProjectContext.fromProject(project)
   val millModuleService = project.getService(classOf[MillModuleService])
   for

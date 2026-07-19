@@ -21,8 +21,8 @@ import scala.collection.mutable.ArrayBuffer
 final class ExtendsBlockMemberReference(
   element: YAMLScalar,
   range: TextRange,
-  cumulativePath: SegmentedPath[NonEmptyList, ScalaIdentifier],
-  modulePath : NamespacedPath[List, ScalaIdentifier],
+  cumulativePath: SegmentedPath[NonEmptyList, String],
+  modulePath : NamespacedPath[List, String],
 ) extends PsiPolyVariantReferenceBase[YAMLScalar](element, range, false):
   override def multiResolve(incompleteCode: Boolean): Array[ResolveResult]  =
     val project = getElement.getProject
@@ -42,7 +42,7 @@ final class ExtendsBlockMemberReference(
 end ExtendsBlockMemberReference
 
 object ExtendsBlockMemberReference:
-  def makeScalaReferencesFor(psiElement: YAMLScalar, modulePath : NamespacedPath[List, ScalaIdentifier]): Array[PsiReference] =
+  def makeScalaReferencesFor(psiElement: YAMLScalar, modulePath : NamespacedPath[List, String]): Array[PsiReference] =
     val rawText = psiElement.getText
     val textValue = psiElement.getTextValue
 
@@ -50,9 +50,9 @@ object ExtendsBlockMemberReference:
       case -1 => 0
       case n  => n
 
-    val parts = textValue.split('.').map(ScalaIdentifier.fromStringOption).takeWhile(_.isDefined).flatten
+    val parts = textValue.split('.')
     var currentOffset = startOffset
-    var cumulativePath: Option[SegmentedPath[NonEmptyList, ScalaIdentifier]] = None
+    var cumulativePath: Option[SegmentedPath[NonEmptyList, String]] = None
     val references = ArrayBuffer[PsiReference]()
 
     for part <- parts do

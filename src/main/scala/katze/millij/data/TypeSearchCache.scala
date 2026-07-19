@@ -28,7 +28,7 @@ final class TypeSearchCache(project: Project):
     )
   }
 
-  def searchPsiClassDumb(text: SegmentedPath[NonEmptyList, ScalaIdentifier])(using Smart): Option[PsiClass] =
+  def searchPsiClassDumb(text: SegmentedPath[NonEmptyList, String])(using Smart): Option[PsiClass] =
     val map = cache.getValue
     map.computeIfAbsent(
       text.asQualified,
@@ -36,26 +36,25 @@ final class TypeSearchCache(project: Project):
     )
   end searchPsiClassDumb
   
-  def searchPsiClass(path : SegmentedPath[NonEmptyList, ScalaIdentifier])(using Smart) : Option[PsiClass] =
+  def searchPsiClass(path : SegmentedPath[NonEmptyList, String])(using Smart) : Option[PsiClass] =
     makePossibleImports(path).collectFirstSome(searchPsiClassDumb)
   end searchPsiClass
   
-  def findPackageDumb(text : SegmentedPath[NonEmptyList, ScalaIdentifier])(using Smart) : Option[PsiPackage] =
+  def findPackageDumb(text : SegmentedPath[NonEmptyList, String])(using Smart) : Option[PsiPackage] =
     val facade = JavaPsiFacade.getInstance(project)
     Option(facade.findPackage(text.asQualified))
   end findPackageDumb
   
-  def findPackages(text : SegmentedPath[NonEmptyList, ScalaIdentifier])(using Smart) : List[PsiPackage] =
+  def findPackages(text : SegmentedPath[NonEmptyList, String])(using Smart) : List[PsiPackage] =
     makePossibleImports(text).flatMap(findPackageDumb)//TODO add scala package objects and other thing support
   end findPackages
   
-  def searchSkType(path : SegmentedPath[NonEmptyList, ScalaIdentifier])(using Smart): Option[ScType] =
+  def searchSkType(path : SegmentedPath[NonEmptyList, String])(using Smart): Option[ScType] =
     searchPsiClass(path).map(ScDesignatorType(_))
   end searchSkType
   
-  def searchSkType(path : String)(using Smart): Option[ScType] = {
-    ScalaSegmentedPath.fromQualifiedNonEmpty(path)
+  def searchSkType(path : String)(using Smart): Option[ScType] = 
+    SegmentedPath.fromQualifiedNonEmpty(path)
       .flatMap(searchSkType)
-  }
   end searchSkType
 end TypeSearchCache

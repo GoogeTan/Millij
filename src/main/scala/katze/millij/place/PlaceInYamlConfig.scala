@@ -3,7 +3,7 @@ package katze.millij.place
 import cats.Applicative
 import cats.syntax.all.*
 import katze.millij.data.module.NamespacedPath
-import katze.millij.data.{ScalaIdentifier, Smart}
+import katze.millij.data.Smart
 import katze.millij.scalatypes.*
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
@@ -19,7 +19,7 @@ import scala.jdk.CollectionConverters.*
 enum PlaceInYamlConfig[Type](val definedMembers : List[String]):
   case Module(
     extendList: List[Type],
-    inFilePath : NamespacedPath[List, ScalaIdentifier],
+    inFilePath : NamespacedPath[List, String],
     override val definedMembers : List[String],
   ) extends PlaceInYamlConfig[Type](definedMembers)
   
@@ -44,10 +44,10 @@ end PlaceInYamlConfig
  * which means that user has tried to write a module inside a member) then it returns `ifCalledOnMemberScope`
  */
 def nestedModulePlaceFromYamlMapping[F[_] : Applicative, Type](
-  name : ScalaIdentifier,
+  name : String,
   parentPlace: PlaceInYamlConfig[Type],
   moduleBody: YAMLMapping,
-  resolveParent : (NamespacedPath[List, ScalaIdentifier], String) => F[Option[Type]],
+  resolveParent : (NamespacedPath[List, String], String) => F[Option[Type]],
   ifCalledOnMemberScope : PlaceInYamlConfig.Member[Type] => F[PlaceInYamlConfig[Type]]
 ) : F[PlaceInYamlConfig[Type]] =
   parentPlace match
@@ -59,7 +59,7 @@ end nestedModulePlaceFromYamlMapping
 
 //TODO Rename me
 def modulePlaceOfYamlMapping[F[_] : Applicative, Type](
-  path: NamespacedPath[List, ScalaIdentifier],
+  path: NamespacedPath[List, String],
   mapping: YAMLMapping,
   resolveParent : String => F[Option[Type]]
 ) : F[PlaceInYamlConfig[Type]] =

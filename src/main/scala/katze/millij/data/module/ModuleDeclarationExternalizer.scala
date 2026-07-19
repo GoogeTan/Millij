@@ -1,37 +1,39 @@
 package katze.millij.data.module
 
 import com.intellij.util.io.{DataExternalizer, DataInputOutputUtil, IOUtil}
-import katze.millij.data.{ScalaIdentifier, SegmentedPath}
+import katze.millij.data.SegmentedPath
 
-import java.io.{DataInput, DataOutput}
+import java.io.{DataInput, DataOutput, IOException}
 import scala.jdk.CollectionConverters.*
 
-class ModuleDeclarationExternalizer extends DataExternalizer[ModuleDeclaration[ScalaIdentifier]]:
-  override def save(out: DataOutput, value: ModuleDeclaration[ScalaIdentifier]): Unit =
+class ModuleDeclarationExternalizer extends DataExternalizer[ModuleDeclaration[String]]:
+  override def save(out: DataOutput, value: ModuleDeclaration[String]): Unit =
     DataInputOutputUtil.writeSeq(out, value.path.namespace.parts.asJava, tpe =>
-      IOUtil.writeUTF(out, tpe.asString)
+      IOUtil.writeUTF(out, tpe)
     )
     DataInputOutputUtil.writeSeq(out, value.path.path.parts.asJava, tpe =>
-      IOUtil.writeUTF(out, tpe.asString)
+      IOUtil.writeUTF(out, tpe)
     )
     DataInputOutputUtil.writeSeq(out, value.superTypes.asJava, tpe =>
       IOUtil.writeUTF(out, tpe.asQualified)
     )
   end save
 
-  override def read(in: DataInput): ModuleDeclaration[ScalaIdentifier] =
+  override def read(in: DataInput): ModuleDeclaration[String] =
     val filePath = SegmentedPath(
       DataInputOutputUtil.readSeq(in, () =>
-        ScalaIdentifier.unsafe(IOUtil.readUTF(in))
+        IOUtil.readUTF(in)
       ).asScala.toList
     )
     val inFilePath = SegmentedPath(
       DataInputOutputUtil.readSeq(in, () =>
-        ScalaIdentifier.unsafe(IOUtil.readUTF(in))
+        IOUtil.readUTF(in)
       ).asScala.toList
     )
     val entityTypes = DataInputOutputUtil.readSeq(in, () =>
-      SegmentedPath.fromQualifiedNonEmpty(IOUtil.readUTF(in)).get.map(ScalaIdentifier.unsafe)
+      SegmentedPath.fromQualifiedNonEmpty(IOUtil.readUTF(in)).getOrElse(
+        throw IOException(s"Incorrect path")
+      )
     ).asScala.toList
 
     ModuleDeclaration(NamespacedPath(filePath, inFilePath), entityTypes)

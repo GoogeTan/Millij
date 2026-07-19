@@ -16,7 +16,7 @@ import scala.jdk.CollectionConverters.*
 
 @Service(Array(Service.Level.PROJECT))
 final class OverridableTraitsService(project: Project):
-  private val cache = CachedValuesManager.getManager(project).createCachedValue[Option[List[ScalaSegmentedPath[NonEmptyList]]]] {
+  private val cache = CachedValuesManager.getManager(project).createCachedValue[Option[List[SegmentedPath[NonEmptyList, String]]]] {
     () =>
       Smart(project) {
         val res = millConfigModule(project).flatMap(millModule =>
@@ -31,7 +31,7 @@ final class OverridableTraitsService(project: Project):
                   case c: ScClass => c
                 .map(_.getQualifiedName)
                 .filter(_ != null)
-                .flatMap(ScalaSegmentedPath.fromQualifiedNonEmpty)
+                .flatMap(SegmentedPath.fromQualifiedNonEmpty)
             )
         )
         CachedValueProvider.Result.create(

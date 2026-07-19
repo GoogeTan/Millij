@@ -4,15 +4,15 @@ import cats.*
 import cats.syntax.all.*
 import katze.millij.scalatypes.{isMvnDependency, ScMapType}
 import katze.millij.data.module.NamespacedPath
-import katze.millij.data.{ScalaIdentifier, SegmentedPath, Smart}
+import katze.millij.data.{SegmentedPath, Smart}
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.project.ProjectContext
 import org.jetbrains.yaml.psi.{YAMLMapping, YAMLPsiElement}
 import scala.jdk.CollectionConverters.*
 
 final class PlaceConfigResolver[F[_] : Applicative](
-  filePath : SegmentedPath[List, ScalaIdentifier],
-  resolveParent: (NamespacedPath[List, ScalaIdentifier], String) => F[Option[ScType]],
+  filePath : SegmentedPath[List, String],
+  resolveParent: (NamespacedPath[List, String], String) => F[Option[ScType]],
   fieldNotFound: (String, PlaceInYamlConfig[ScType]) => F[PlaceInYamlConfig[ScType]],
   expectedObjectBody: PlaceInYamlConfig.Member[ScType] => F[PlaceInYamlConfig[ScType]],
   expectedRhs: PlaceInYamlConfig[ScType] => F[PlaceInYamlConfig[ScType]],
@@ -30,7 +30,7 @@ final class PlaceConfigResolver[F[_] : Applicative](
         memberPlace(scope, name).fold(fieldNotFound(name, scope))(_.pure[F])
   end field
 
-  override def module(parent: PlaceInYamlConfig[ScType], name: ScalaIdentifier, modulePsiElement: YAMLMapping): F[PlaceInYamlConfig[ScType]] =
+  override def module(parent: PlaceInYamlConfig[ScType], name: String, modulePsiElement: YAMLMapping): F[PlaceInYamlConfig[ScType]] =
     nestedModulePlaceFromYamlMapping(
       name = name,
       parentPlace = parent,
@@ -79,8 +79,8 @@ object PlaceConfigResolver:
   type EitherString[A] = Either[String, A]
 
   def apply(
-    filePath : SegmentedPath[List, ScalaIdentifier],
-    search: (NamespacedPath[List, ScalaIdentifier], String) => EitherString[Option[ScType]],
+    filePath : SegmentedPath[List, String],
+    search: (NamespacedPath[List, String], String) => EitherString[Option[ScType]],
   )(using Smart, ProjectContext): PlaceConfigResolver[EitherString] =
     new PlaceConfigResolver[EitherString](
       filePath = filePath,
@@ -94,8 +94,8 @@ object PlaceConfigResolver:
   end apply
 
   def option(
-    filePath : SegmentedPath[List, ScalaIdentifier],
-    search: (NamespacedPath[List, ScalaIdentifier], String) => Option[ScType],
+    filePath : SegmentedPath[List, String],
+    search: (NamespacedPath[List, String], String) => Option[ScType],
   )(using Smart, ProjectContext): PlaceConfigResolver[Option] =
     new PlaceConfigResolver[Option](
       filePath = filePath,

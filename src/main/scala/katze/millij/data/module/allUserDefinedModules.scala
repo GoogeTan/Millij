@@ -20,9 +20,9 @@ import scala.jdk.CollectionConverters.*
 /**
  * Returns all the modules defined by the user in the whole project.
  */
-def allUserDefinedModules(scope : GlobalSearchScope)(using Smart) : List[ModuleDeclaration[ScalaIdentifier]] =
+def allUserDefinedModules(scope : GlobalSearchScope)(using Smart) : List[ModuleDeclaration[String]] =
   val index = FileBasedIndex.getInstance()
-  val results = ListBuffer.empty[ModuleDeclaration[ScalaIdentifier]]//TODO replace with thread safe ConcurrentLinkedQueue
+  val results = ListBuffer.empty[ModuleDeclaration[String]]//TODO replace with thread safe ConcurrentLinkedQueue
 
   index.processAllKeys(YamlModuleIndex.Name, { path =>
     index.processValues(

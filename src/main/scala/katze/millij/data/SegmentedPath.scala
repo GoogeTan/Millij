@@ -3,7 +3,7 @@ package katze.millij.data
 import cats.*
 import cats.data.NonEmptyList
 import cats.syntax.all.*
-import katze.millij.data.{ResolvedPath, ScalaIdentifier}
+import katze.millij.data.ResolvedPath
 
 import scala.annotation.targetName
 
@@ -89,6 +89,10 @@ object SegmentedPath:
   def fromQualifiedNonEmpty(str: String): Option[SegmentedPath[NonEmptyList, String]] =
     fromQualified(str).asNonEmpty
   end fromQualifiedNonEmpty
+
+  def fromQualifiedNonEmptyUnsafe(str: String): SegmentedPath[NonEmptyList, String] =
+    fromQualifiedNonEmpty(str).get
+  end fromQualifiedNonEmptyUnsafe
 
   def fromPath(str : String) : SegmentedPath[List, String] =
     if str.isBlank then

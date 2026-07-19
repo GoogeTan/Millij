@@ -20,9 +20,9 @@ final class MillYamlInlayHintsProvider extends InlayHintsProvider:
   override def createCollector(psiFile: PsiFile, editor: Editor): InlayHintsCollector | Null =
     val project = psiFile.getProject
     Smart(project) {
-      psiFile.getVirtualFile
+      psiFile.getVirtualFile//TODO extract psi-file relative segmented path
         .relativePathToContentRoot(project)
-        .flatMap(ScalaSegmentedPath.fromPath)
+        .map(SegmentedPath.folderPath)
         .map(rootPath =>
           Collector(richPlaceConfigResolverOption(project, rootPath))
         ).orNull

@@ -6,7 +6,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.tree.{IElementType, IFileElementType}
 import com.intellij.util.indexing.*
 import com.intellij.util.io.{DataExternalizer, KeyDescriptor}
-import katze.millij.data.{ScalaIdentifier, ScalaSegmentedPath, SegmentedPath}
+import katze.millij.data.SegmentedPath
 import katze.millij.file.relativePathToContentRoot
 import katze.millij.place.{extractObjectName, getExtendsContentsOf}
 import org.jetbrains.yaml.{YAMLElementTypes, YAMLTokenTypes}
@@ -17,13 +17,13 @@ import java.util
 import scala.jdk.CollectionConverters.*
 
 
-final class YamlModuleIndex extends FileBasedIndexExtension[SegmentedPath[List, ScalaIdentifier], ModuleDeclaration[ScalaIdentifier]]:
+final class YamlModuleIndex extends FileBasedIndexExtension[SegmentedPath[List, String], ModuleDeclaration[String]]:
 
-  override def getName: ID[SegmentedPath[List, ScalaIdentifier], ModuleDeclaration[ScalaIdentifier]] = YamlModuleIndex.Name
+  override def getName: ID[SegmentedPath[List, String], ModuleDeclaration[String]] = YamlModuleIndex.Name
 
-  override def getKeyDescriptor: KeyDescriptor[SegmentedPath[List, ScalaIdentifier]] = SegmentedPathKeyDescriptor
+  override def getKeyDescriptor: KeyDescriptor[SegmentedPath[List, String]] = SegmentedPathKeyDescriptor
 
-  override def getValueExternalizer: DataExternalizer[ModuleDeclaration[ScalaIdentifier]] = ModuleDeclarationExternalizer()
+  override def getValueExternalizer: DataExternalizer[ModuleDeclaration[String]] = ModuleDeclarationExternalizer()
 
   override def getVersion: Int = 27
 
@@ -33,9 +33,9 @@ final class YamlModuleIndex extends FileBasedIndexExtension[SegmentedPath[List, 
     file.getName.endsWith(".mill.yaml")
   end getInputFilter
 
-  override def getIndexer: DataIndexer[SegmentedPath[List, ScalaIdentifier], ModuleDeclaration[ScalaIdentifier], FileContent] =
+  override def getIndexer: DataIndexer[SegmentedPath[List, String], ModuleDeclaration[String], FileContent] =
     (inputData: FileContent) =>
-      val map = new util.HashMap[SegmentedPath[List, ScalaIdentifier], ModuleDeclaration[ScalaIdentifier]]()
+      val map = new util.HashMap[SegmentedPath[List, String], ModuleDeclaration[String]]()
       val rootPath = rootFileModulePath(inputData).getOrElse(SegmentedPath(Nil))
       val text = inputData.getContentAsText
 
@@ -65,21 +65,21 @@ final class YamlModuleIndex extends FileBasedIndexExtension[SegmentedPath[List, 
       map
   end getIndexer
 
-  def rootFileModulePath(inputData : FileContent) : Option[SegmentedPath[List, ScalaIdentifier]] =
-    inputData.relativePathToContentRoot.flatMap(relativePath =>
-      if relativePath.contains('/') then
+  def rootFileModulePath(inputData : FileContent) : Option[SegmentedPath[List, String]] =
+    inputData.relativePathToContentRoot.map(relativePath =>
+      if relativePath.contains('/') then//TODO is this folderPath?
         val parentPath = relativePath.substring(0, relativePath.lastIndexOf('/'))
-        SegmentedPath.fromQualified(parentPath.replace('/', '.')).traverse(ScalaIdentifier.fromStringOption)
+        SegmentedPath.fromQualified(parentPath.replace('/', '.'))
       else
-        Some(SegmentedPath(Nil))
+        SegmentedPath(Nil)
       end if
     )
   end rootFileModulePath
   
   def collectModules(
     module : YAMLPsiElement,
-    path : NamespacedPath[List, ScalaIdentifier],
-    resultConsumer: ModuleDeclaration[ScalaIdentifier] => Unit
+    path : NamespacedPath[List, String],
+    resultConsumer: ModuleDeclaration[String] => Unit
   ) : Unit =
     module match
       case document: YAMLDocument =>
@@ -92,7 +92,7 @@ final class YamlModuleIndex extends FileBasedIndexExtension[SegmentedPath[List, 
         ) 
       case mapping: YAMLMapping =>
         val extendsOf = getExtendsContentsOf(mapping).toList.flatten
-                          .flatMap(ScalaSegmentedPath.fromQualifiedNonEmpty)
+                          .flatMap(SegmentedPath.fromQualifiedNonEmpty)
         resultConsumer(
           ModuleDeclaration(
             path,
@@ -109,8 +109,8 @@ final class YamlModuleIndex extends FileBasedIndexExtension[SegmentedPath[List, 
     tree: LighterAST,
     node: LighterASTNode,
     text: CharSequence,
-    path : NamespacedPath[List, ScalaIdentifier],
-    resultConsumer: ModuleDeclaration[ScalaIdentifier] => Unit
+    path : NamespacedPath[List, String],
+    resultConsumer: ModuleDeclaration[String] => Unit
   ): Unit =
     val tokenType = node.getTokenType
     val children = tree.getChildren(node).asScala.toList
@@ -150,7 +150,7 @@ final class YamlModuleIndex extends FileBasedIndexExtension[SegmentedPath[List, 
     tree: LighterAST,
     mappingChildren: List[LighterASTNode],
     text: CharSequence
-  ): List[SegmentedPath[NonEmptyList, ScalaIdentifier]] =
+  ): List[SegmentedPath[NonEmptyList, String]] =
     val extendsKvOpt = mappingChildren.find: kvNode =>
       if kvNode.getTokenType == YAMLElementTypes.KEY_VALUE_PAIR then
         val kvChildren = tree.getChildren(kvNode).asScala.toList
@@ -172,7 +172,7 @@ final class YamlModuleIndex extends FileBasedIndexExtension[SegmentedPath[List, 
                 val raw = text.subSequence(item.getStartOffset, item.getEndOffset).toString.replaceAll("^-", "").trim
                 stripQuotes(raw)
               )
-              .flatMap(ScalaSegmentedPath.fromQualifiedNonEmpty)
+              .flatMap(SegmentedPath.fromQualifiedNonEmpty)
           case None =>
             val keyNodeOpt = kvChildren.find(c => isScalar(c.getTokenType))
             val valNodeOpt = keyNodeOpt.flatMap { keyNode =>
@@ -182,7 +182,7 @@ final class YamlModuleIndex extends FileBasedIndexExtension[SegmentedPath[List, 
               case Some(valNode) =>
                 val raw = text.subSequence(valNode.getStartOffset, valNode.getEndOffset).toString
                 val extendsStr = stripQuotes(raw)
-                ScalaSegmentedPath.fromQualifiedNonEmpty(extendsStr).toList
+                SegmentedPath.fromQualifiedNonEmpty(extendsStr).toList
               case None =>
                 Nil
       case None =>
@@ -211,5 +211,5 @@ final class YamlModuleIndex extends FileBasedIndexExtension[SegmentedPath[List, 
 end YamlModuleIndex
 
 object YamlModuleIndex:
-  val Name: ID[SegmentedPath[List, ScalaIdentifier], ModuleDeclaration[ScalaIdentifier]] = ID.create("millij.yaml.modules")
+  val Name: ID[SegmentedPath[List, String], ModuleDeclaration[String]] = ID.create("millij.yaml.modules")
 end YamlModuleIndex

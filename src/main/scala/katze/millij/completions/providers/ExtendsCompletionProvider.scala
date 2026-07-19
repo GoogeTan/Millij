@@ -10,7 +10,7 @@ import katze.millij.completions.cool.CoolCompletionProvider
 import katze.millij.completions.insert
 import katze.millij.completions.insert.{ExtendsArrayInsertHandler, YamlKeyInsertHandler}
 import katze.millij.data.module.NamespacedPath
-import katze.millij.data.{ScalaIdentifier, Smart}
+import katze.millij.data.Smart
 import katze.millij.place.enclosingModule
 import katze.millij.psi.*
 import katze.millij.scalatypes.{searchForDependentOverridableTraits, searchForOverridableTraits, shortFqn}
@@ -22,7 +22,7 @@ import cats.syntax.all.*
 class YamlPrefixMatcher(
   prefix: String,
   originalMatcher: PrefixMatcher,
-  enclosingModule: NamespacedPath[List, ScalaIdentifier]
+  enclosingModule: NamespacedPath[List, String]
 ) extends PrefixMatcher(prefix):
 
   private val scopes: List[String] =
@@ -173,7 +173,7 @@ end makeScalaExtendsSuggestions
  */
 def makeYamlExtendsSuggestions(
   project : Project,
-  module: NamespacedPath[List, ScalaIdentifier],
+  module: NamespacedPath[List, String],
   exclude : List[String]
 )(using Smart) : List[LookupElement] =
   val yamlTraits = searchForDependentOverridableTraits(module, project)
