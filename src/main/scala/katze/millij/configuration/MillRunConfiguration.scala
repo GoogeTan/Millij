@@ -5,7 +5,8 @@ import com.intellij.execution.configurations.*
 import com.intellij.execution.process.{OSProcessHandler, ProcessHandler}
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.options.SettingsEditor
-import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.{Project, ProjectUtil}
+import katze.millij.externalSystem.MillRunner
 import org.jdom.Element
 
 class MillRunConfiguration(project: Project, factory: ConfigurationFactory, name: String)
@@ -17,8 +18,13 @@ class MillRunConfiguration(project: Project, factory: ConfigurationFactory, name
 
   override def getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState =
     new CommandLineState(environment):
-      override def startProcess(): ProcessHandler =
-        val commandLine = new GeneralCommandLine("mill", "--no-server", taskName)
+      override def startProcess(): ProcessHandler = 
+        val projectDir = ProjectUtil.guessProjectDir(project)
+        if projectDir == null then
+          throw RuntimeConfigurationError("Couldn't determine project directory")
+        end if
+        val millExecutable = MillRunner.findMillExecutable(projectDir).getOrElse(throw RuntimeConfigurationError("Mill executable or script was not found. Please add a script or install mill globally"))//TODO add suggestion to download a script for user
+        val commandLine = new GeneralCommandLine(millExecutable, "--no-server", taskName)
         commandLine.setWorkDirectory(project.getBasePath)
         new OSProcessHandler(commandLine)
       end startProcess
