@@ -1,5 +1,6 @@
 package katze.millij.data
 
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.Project
 import org.jetbrains.idea.reposearch.{DependencySearchService, RepositoryArtifactData, SearchParameters}
@@ -8,6 +9,8 @@ import java.util.concurrent.{CountDownLatch, TimeUnit}
 import java.util.function.Consumer
 
 object DependencySearchWrapper:
+  private val Log = Logger.getInstance(classOf[DependencySearchWrapper.type])
+  
   //TODO fix me
   def searchCoordinates(
     project: Project,
@@ -25,19 +28,19 @@ object DependencySearchWrapper:
     val consumer = new Consumer[RepositoryArtifactData]:
       override def accept(data: RepositoryArtifactData): Unit =
         // We log the type, just to make sure we're getting something useful
-        println(s"--- Data received: ${data.getClass.getName} (key: ${data.getKey}) ---")
+        Log.debug(s"--- Data received: ${data.getClass.getName} (key: ${data.getKey}) ---")
         ProgressManager.checkCanceled()
         onResult(data)
 
-    println(s"--- Using fulltextSearch for $query ---")
+    Log.debug(s"--- Using fulltextSearch for $query ---")
     val promise = service.fulltextSearch(query, params, consumer)
 
     promise.onSuccess((t: Integer) =>
-      println(s"--- Promise success: $t ---")
+      Log.debug(s"--- Promise success: $t ---")
       latch.countDown()
     )
     promise.onError((t: Throwable) =>
-      println(s"--- Promise error: ${t.getMessage} ---")
+      Log.debug(s"--- Promise error: ${t.getMessage} ---")
       latch.countDown()
     )
 
@@ -46,7 +49,7 @@ object DependencySearchWrapper:
       while !latch.await(50, TimeUnit.MILLISECONDS) && count < 100 do
         count += 1
         ProgressManager.checkCanceled()
-      if (latch.getCount > 0) println("--- Latch timed out! ---")
+      if (latch.getCount > 0) Log.debug("--- Latch timed out! ---")
     catch
       case _: InterruptedException =>
     end try

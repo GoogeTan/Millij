@@ -3,14 +3,18 @@ package katze.millij.data
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import katze.millij.*
 import katze.millij.data.DependencySearchWrapper
+import katze.millij.wizard.MillNewProjectWizardStep
 import org.jetbrains.idea.reposearch.RepositoryArtifactData
 
 import scala.jdk.CollectionConverters.*
 
 object MavenDependencyShared:
+  private val Log = Logger.getInstance(classOf[MavenDependencyShared.type])
+  
   def searchAndSuggestDependencies(
     resultSet: CompletionResultSet,
     scalaVersion: String,
@@ -26,15 +30,15 @@ object MavenDependencyShared:
     val dep = PartialMillDependency.parse(fullText)
     val searchArtifactId = dep.artifactId.getOrElse("")
 
-    println(s"--- Dependency Suggestion ---")
-    println(s"  * Prefix Matcher: '$fullText'")
-    println(s"  * Parsed Request -> Group: '${dep.groupId}', Artifact: '$searchArtifactId'")
+    Log.debug(s"--- Dependency Suggestion ---")
+    Log.debug(s"  * Prefix Matcher: '$fullText'")
+    Log.debug(s"  * Parsed Request -> Group: '${dep.groupId}', Artifact: '$searchArtifactId'")
 
     DependencySearchWrapper.searchCoordinates(
       project,
       s"${dep.groupId}${dep.artifactId.fold("")(t => s":${t}")}",
       (t: RepositoryArtifactData) =>
-        println(s"  * Received result: ${t.getClass.getName}")
+        Log.debug(s"  * Received result: ${t.getClass.getName}")
         if !t.getClass.getSimpleName.contains("Poisoned") then
           try
             val getGroupIdMethod = t.getClass.getMethod("getGroupId")
@@ -108,7 +112,7 @@ object MavenDependencyShared:
                   )
           catch
             case e: NoSuchMethodException =>
-              println(s"  * ERROR NoSuchMethodException: ${e.getMessage} on class ${t.getClass.getName}")
-            case e: Exception => println(s"  * ERROR parsing artifact data: ${e.getMessage}")
+              Log.error(s"  * ERROR NoSuchMethodException: ${e.getMessage} on class ${t.getClass.getName}")
+            case e: Exception => Log.error(s"  * ERROR parsing artifact data: ${e.getMessage}")
     )
 end MavenDependencyShared

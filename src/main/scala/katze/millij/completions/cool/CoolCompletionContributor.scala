@@ -38,7 +38,7 @@ trait CoolCompletionContributor extends CompletionContributor:
             case Some(value) =>
               completionProvider(value, processingContext, completionResultSet)
             case None =>
-              println("Pattern failed!")
+              LOG.error("Pattern failed!")
     )
   end patternExtend
       
@@ -68,7 +68,7 @@ trait CoolCompletionContributor extends CompletionContributor:
             case (Some(element), Some(parents)) =>
               provider(parameters, element, parents, context, result)
             case _ =>
-              LOG.error(s"Encountered impossible situation. Please, report to to mill suggestion")
+              LOG.error(s"Encountered impossible situation. Please, report to millij github repo")
         end addCompletions
     )
 end CoolCompletionContributor
