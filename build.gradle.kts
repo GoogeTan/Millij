@@ -64,6 +64,18 @@ intellijPlatform {
             current()
         }
     }
+
+    signing {
+        val certPath = providers.gradleProperty("millijPlugin.signing.cert")
+        val keyPath = providers.gradleProperty("millijPlugin.signing.key")
+        val keyPass = providers.gradleProperty("millijPlugin.signing.password")
+
+        if (certPath.isPresent && keyPath.isPresent) {
+            certificateChain = file(certPath.get()).readText()
+            privateKey = file(keyPath.get()).readText()
+            password = keyPass.orNull
+        }
+    }
 }
 
 // Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
