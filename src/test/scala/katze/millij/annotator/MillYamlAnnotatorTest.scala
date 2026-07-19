@@ -148,4 +148,20 @@ class MillYamlAnnotatorTest extends BasePlatformTestCase:
     )
     myFixture.checkHighlighting(false, true, false)
   end testMapKeysGenerateNoError
+
+  def testAbsentParent(): Unit =
+    myFixture.configureByText(
+      "build.mill.yaml",
+      """
+        |extends: [<error descr="Could not find trait with name SbtModule3" textAttributesKey="ERRORS_ATTRIBUTES">SbtModule3</error>]
+        |
+        |<info descr="null" textAttributesKey="MILL_YAML_OBJECT_KEYWORD">object</info><info descr="null" textAttributesKey="MILL_YAML_MODULE_NAME"> a</info>:
+        |
+        |
+        |<info descr="null" textAttributesKey="MILL_YAML_OBJECT_KEYWORD">object</info><info descr="null" textAttributesKey="MILL_YAML_MODULE_NAME"> b</info>:
+        | extends: <error descr="Could not find trait with name build.a.Trait" textAttributesKey="ERRORS_ATTRIBUTES">build.a.Trait</error>
+        |""".stripMargin
+    )
+    myFixture.checkHighlighting(false, true, false)
+  end testAbsentParent
 end MillYamlAnnotatorTest

@@ -27,13 +27,12 @@ def extendsBlockMembersAnnotator(
     )
   ] =
   case ((element, _, module), annotationHolder) =>
-    for 
+    for
       enclosingMod <- enclosingModule(element)
       service = element.getProject.getService(classOf[MillModuleService])
       enclosingModuleType <- service.resolveModuleByName(enclosingMod)
-      cycle <- enclosingModuleType.cyclesOfDependnecies
-      dependsOn <- cycle.whatModuleDependsOn(enclosingMod.fullPath)
-      problematicSuper <- enclosingModuleType.dependencies.map(_.segmentedPath).filter(_.startsWith(dependsOn))
+      cycles = enclosingModuleType.cyclesOfDependnecies
+      problematicDependencies = cycles.map(_.whatModuleDependsOn(enclosingMod.fullPath).get/*We can use get here as it is guaranteed that cycle contains the module*/)
       scalar <- element.getValue match
         case scalar : YAMLScalar => List(scalar)
         case lst : YAMLSequence =>
@@ -44,11 +43,17 @@ def extendsBlockMembersAnnotator(
               case s : YAMLScalar => s
         case _ =>
           Nil
-    do
+    do 
+      val isProblematic =
+        problematicDependencies.exists(
+          problematicSuper =>
+            scalar.getTextValue.trim.contains(problematicSuper.asQualified)
+        )
       annotateScalar(
         enclosingMod,
         scalar,
         annotationHolder,
-        scalar.getTextValue.trim.contains(problematicSuper.asQualified)
+        isProblematic
       )
+    end for
 end extendsBlockMembersAnnotator
