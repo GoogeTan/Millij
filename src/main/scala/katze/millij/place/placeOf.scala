@@ -160,9 +160,8 @@ end richPlaceConfigResolverOption
 
 def richPlaceSearch[F[_] : Applicative](project : Project)(using Smart) = (module: NamespacedPath[List, ScalaIdentifier], name: String) =>
   given ProjectContext = ProjectContext.fromProject(project)
-  SegmentedPath
+  ScalaSegmentedPath
     .fromQualifiedNonEmpty(name)
-    .flatMap(_.traverse(ScalaIdentifier.fromStringOption))
     .flatMap(
       project.getService(classOf[MillModuleService])
         .resolvePath(module, _)

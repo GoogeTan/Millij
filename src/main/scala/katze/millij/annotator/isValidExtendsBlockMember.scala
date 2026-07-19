@@ -9,9 +9,7 @@ import org.jetbrains.yaml.psi.{YAMLScalar, YAMLSequence, YAMLSequenceItem}
 def isValidExtendsBlockMember(context: NamespacedPath[List, ScalaIdentifier], scalar: YAMLScalar)(using Smart) : Boolean =
   val project = scalar.getProject
   val searchService = project.getService(classOf[MillModuleService])
-  SegmentedPath
-    .fromQualifiedNonEmpty(scalar.getTextValue)
-    .flatMap(_.traverse(ScalaIdentifier.fromStringOption))
+  ScalaSegmentedPath.fromQualifiedNonEmpty(scalar.getTextValue)
     .flatMap(searchService.resolvePath(context, _).completelyResolvedTarget)
     .isDefined
 end isValidExtendsBlockMember

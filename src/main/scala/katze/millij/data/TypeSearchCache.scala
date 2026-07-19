@@ -53,10 +53,9 @@ final class TypeSearchCache(project: Project):
     searchPsiClass(path).map(ScDesignatorType(_))
   end searchSkType
   
-  def searchSkType(path : String)(using Smart): Option[ScType] =
-    SegmentedPath
-      .fromQualifiedNonEmpty(path)
-      .flatMap(_.traverse(ScalaIdentifier.fromStringOption))
+  def searchSkType(path : String)(using Smart): Option[ScType] = {
+    ScalaSegmentedPath.fromQualifiedNonEmpty(path)
       .flatMap(searchSkType)
+  }
   end searchSkType
 end TypeSearchCache

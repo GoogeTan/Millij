@@ -22,8 +22,7 @@ final class MillYamlInlayHintsProvider extends InlayHintsProvider:
     Smart(project) {
       psiFile.getVirtualFile
         .relativePathToContentRoot(project)
-        .map(SegmentedPath.fromPath)
-        .flatMap(_.traverse(ScalaIdentifier.fromStringOption))
+        .flatMap(ScalaSegmentedPath.fromPath)
         .map(rootPath =>
           Collector(richPlaceConfigResolverOption(project, rootPath))
         ).orNull
