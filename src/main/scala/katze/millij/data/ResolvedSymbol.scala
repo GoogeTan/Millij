@@ -39,36 +39,6 @@ enum ResolvedSymbol[Segment](val element : PsiElement):
     end match
   end scalaTraitType
 
-  def scTypeForQualifiedSearch(using ProjectContext) : Option[ScType] =
-    this match
-      case ResolvedSymbol.ScalaTrait(parentType, element) =>
-        element.baseCompanion.collect:
-          case ob : ScObject =>
-            parentType.fold(
-              ScDesignatorType(ob)
-            )(
-              ScProjectionType(_, ob)
-            )
-      case ResolvedSymbol.ScalaObject(parentType, element) =>
-        Some(
-          parentType.fold(
-            ScDesignatorType(element)
-          )(
-            ScProjectionType(_, element)
-          )
-        )
-      case ResolvedSymbol.ScalaClass(parentType, element) =>
-        element.baseCompanion.collect:
-          case ob : ScObject =>
-            parentType.fold(
-              ScDesignatorType(ob)
-            )(
-              ScProjectionType(_, ob)
-            )
-      case ResolvedSymbol.ScalaPackage(element) =>
-        None
-      case ResolvedSymbol.YamlModule(modulePath, moduleType, element) =>
-        None
 end ResolvedSymbol
 
 object ResolvedSymbol:
@@ -86,4 +56,37 @@ object ResolvedSymbol:
         None
     end match
   end fromPsiElement
+
+  extension[Segment] (value : ResolvedSymbol.ScalaTrait[Segment])
+    def scTypeForQualifiedSearch(using ProjectContext) : Option[ScType] =
+      value.element.baseCompanion.collect:
+        case ob : ScObject =>
+          value.parentType.fold(
+            ScDesignatorType(ob)
+          )(
+            ScProjectionType(_, ob)
+          )
+  end extension
+  
+  extension[Segment] (value : ResolvedSymbol.ScalaObject[Segment])
+    def scTypeForQualifiedSearch(using ProjectContext) : Option[ScType] =
+      Some(
+        value.parentType.fold(
+          ScDesignatorType(value.element)
+        )(
+          ScProjectionType(_, value.element)
+        )
+      )
+  end extension
+  
+  extension[Segment] (value : ResolvedSymbol.ScalaClass[Segment])
+    def scTypeForQualifiedSearch(using ProjectContext) : Option[ScType] =
+      value.element.baseCompanion.collect:
+        case ob : ScObject =>
+          value.parentType.fold(
+            ScDesignatorType(ob)
+          )(
+            ScProjectionType(_, ob)
+          )
+  end extension
 end ResolvedSymbol

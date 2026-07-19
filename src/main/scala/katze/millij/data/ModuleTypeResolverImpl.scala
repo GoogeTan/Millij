@@ -147,16 +147,20 @@ final class ModuleTypeResolverImpl[Segment : {Eq, Show}](
     memberName : Segment,
     resolution : List[SegmentedPath[List, Segment]]
   )(using Smart, ProjectContext) : Option[ResolvedSymbol[Segment]] =
-    resolvedSymbol.scTypeForQualifiedSearch match
-      case Some(scType) =>
-        resolveInTypeDependency(scType, memberName)
-      case None =>
-        resolvedSymbol match
-          case ResolvedSymbol.ScalaPackage(element) =>
-            resolvePackageMember(element, memberName)
-          case ResolvedSymbol.YamlModule(modulePath, moduleType, _) =>
-            findModuleMember(modulePath, moduleType, memberName, resolution)
-        end match
+    resolvedSymbol match
+      case resolvedSymbol : ResolvedSymbol.ScalaClass[Segment] =>
+        resolvedSymbol.scTypeForQualifiedSearch
+          .flatMap(resolveInTypeDependency(_, memberName))
+      case resolvedSymbol : ResolvedSymbol.ScalaTrait[Segment] =>
+        resolvedSymbol.scTypeForQualifiedSearch
+          .flatMap(resolveInTypeDependency(_, memberName))
+      case resolvedSymbol : ResolvedSymbol.ScalaObject[Segment] =>
+        resolvedSymbol.scTypeForQualifiedSearch
+          .flatMap(resolveInTypeDependency(_, memberName))
+      case ResolvedSymbol.ScalaPackage(element) =>
+        resolvePackageMember(element, memberName)
+      case ResolvedSymbol.YamlModule(modulePath, moduleType, _) =>
+        findModuleMember(modulePath, moduleType, memberName, resolution)
     end match
   end findMember
 end ModuleTypeResolverImpl
