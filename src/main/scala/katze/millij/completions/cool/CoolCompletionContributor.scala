@@ -38,7 +38,7 @@ trait CoolCompletionContributor extends CompletionContributor:
             case Some(value) =>
               completionProvider(value, processingContext, completionResultSet)
             case None =>
-              LOG.error("Pattern failed!")
+              LOG.debug(s"Cool pattern has failed! That should never happen. The pattern: ${pattern}")
     )
   end patternExtend
       
