@@ -192,7 +192,7 @@ final class YamlModuleIndex extends FileBasedIndexExtension[SegmentedPath[List, 
 
   private def stripQuotes(s: String): String =
     val trimmed = s.trim
-    if (trimmed.startsWith("\"") && trimmed.endsWith("\"")) || (trimmed.startsWith("'") && trimmed.endsWith("'")) then
+    if trimmed.length > 1 && ((trimmed.startsWith("\"") && trimmed.endsWith("\"")) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) then
       trimmed.substring(1, trimmed.length - 1)
     else
       trimmed
