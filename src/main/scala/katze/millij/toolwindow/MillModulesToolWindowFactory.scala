@@ -18,9 +18,11 @@ import com.intellij.ui.content.ContentFactory
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.ui.{DoubleClickListener, SearchTextField}
 import katze.millij.configuration.{MillRunConfiguration, MillRunConfigurationType}
+import katze.millij.data.MillijBundle
 
 import java.awt.BorderLayout
 import java.awt.event.MouseEvent
+import javax.swing.event.{DocumentEvent, DocumentListener}
 import javax.swing.tree.{DefaultMutableTreeNode, DefaultTreeModel}
 
 class MillModulesToolWindowFactory extends ToolWindowFactory:
@@ -29,11 +31,15 @@ class MillModulesToolWindowFactory extends ToolWindowFactory:
 
   override def createToolWindowContent(project: Project, toolWindow: ToolWindow): Unit =
     toolWindow.setIcon(icon)
-    val tree = new Tree(new DefaultTreeModel(new DefaultMutableTreeNode("Loading Mill Tasks...")))
+    val tree = new Tree(new DefaultTreeModel(new DefaultMutableTreeNode(MillijBundle.message("tool.window.loading"))))
     tree.setRootVisible(true)
 
     val actionGroup = new DefaultActionGroup()
-    val reloadAction = new AnAction("Reload", "Reload Mill tasks", AllIcons.Actions.Refresh):
+    val reloadAction = new AnAction(
+      MillijBundle.message("tool.window.reload.label"),
+      MillijBundle.message("tool.window.reload.description"),
+      AllIcons.Actions.Refresh
+    ):
       override def actionPerformed(e: AnActionEvent): Unit =
         loadTasksAsync(project, tree)
     actionGroup.add(reloadAction)
@@ -73,12 +79,12 @@ class MillModulesToolWindowFactory extends ToolWindowFactory:
 
   def makeSearchField(setTree : DefaultMutableTreeNode => Unit) =
     val searchField = new SearchTextField()
-    searchField.addDocumentListener(new javax.swing.event.DocumentListener {
-      override def insertUpdate(e: javax.swing.event.DocumentEvent): Unit = filterTree()
+    searchField.addDocumentListener(new DocumentListener {
+      override def insertUpdate(e: DocumentEvent): Unit = filterTree()
 
-      override def removeUpdate(e: javax.swing.event.DocumentEvent): Unit = filterTree()
+      override def removeUpdate(e: DocumentEvent): Unit = filterTree()
 
-      override def changedUpdate(e: javax.swing.event.DocumentEvent): Unit = filterTree()
+      override def changedUpdate(e: DocumentEvent): Unit = filterTree()
 
       def filterTree(): Unit = {
         val searchText = searchField.getText
@@ -109,16 +115,16 @@ class MillModulesToolWindowFactory extends ToolWindowFactory:
       if processOutput.getExitCode == 0 then
         Right(processOutput.getStdout.split("\n").map(_.trim).filter(_.nonEmpty).toList)
       else
-        Left(s"Mill failed: ${processOutput.getStderr}")
-    catch
-      case e: Exception =>
-        Left(s"Command execution threw an exception: ${e.getMessage}")
+        Left(MillijBundle.message("tool.window.execute.mill.failed", processOutput.getStderr))
+      catch
+        case e: Exception =>
+          Left(MillijBundle.message("tool.window.execute.exception.failed", e.getMessage))
   end executeMillCommand
 
   private def buildTree(tasks: List[String]): DefaultMutableTreeNode =
     val root = new DefaultMutableTreeNode("Mill Project")
     if tasks.isEmpty then
-      root.add(new DefaultMutableTreeNode("No tasks found"))
+      root.add(new DefaultMutableTreeNode(MillijBundle.message("tool.window.no.tasks.found")))
     else
       tasks.foreach:
         task =>

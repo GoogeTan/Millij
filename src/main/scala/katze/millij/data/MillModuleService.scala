@@ -24,7 +24,7 @@ final class MillModuleService(project: Project):
   private val resolved = CachedValuesManager.getManager(project).createCachedValue { () =>
     CachedValueProvider.Result.create(
       new ConcurrentHashMap[SegmentedPath[List, ScalaIdentifier], ModuleType[ScalaIdentifier]](),
-      PsiModificationTracker.MODIFICATION_COUNT,
+      PsiModificationTracker.MODIFICATION_COUNT,//TODO use something more specific. Like own modification counter or resolve types into descriptions(e.g. Scala sclass names, file paths and etc).
       com.intellij.openapi.roots.ProjectRootManager.getInstance(project)
     )
   }
