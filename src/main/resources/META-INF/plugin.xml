@@ -22,7 +22,6 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <psi.elementFinder implementation="katze.millij.elementfinder.YamlObjectFinder"/>
         <configurationType implementation="katze.millij.configuration.MillRunConfigurationType"/>
         <postStartupActivity implementation="katze.millij.MillProjectStartupActivity"/>
         <completion.contributor language="yaml" implementationClass="katze.millij.completions.SmartYamlCompletionContributor"/>
