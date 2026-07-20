@@ -1,13 +1,14 @@
-package katze.millij.annotator
+package katze.millij.annotator.annotators
 
 import com.intellij.lang.annotation.{AnnotationHolder, HighlightSeverity}
+import katze.millij.annotator.lib.CoolAnnotator
 import katze.millij.data.module.NamespacedPath
 import katze.millij.data.{MillModuleService, Smart}
-import katze.millij.psi.{YAMLKeyValueWithKey, YAMLMillModule}
 import katze.millij.file.*
 import katze.millij.place.*
+import katze.millij.psi.{YAMLKeyValueWithKey, YAMLMillModule}
 import org.jetbrains.yaml.psi.impl.YAMLValueImpl
-import org.jetbrains.yaml.psi.{YAMLAlias, YAMLCompoundValue, YAMLMapping, YAMLScalar, YAMLSequence, YAMLSequenceItem}
+import org.jetbrains.yaml.psi.*
 
 import scala.jdk.CollectionConverters.*
 

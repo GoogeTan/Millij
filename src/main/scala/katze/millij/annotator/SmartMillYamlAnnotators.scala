@@ -2,7 +2,8 @@ package katze.millij.annotator
 
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.psi.PsiElement
-import katze.millij.annotator.{CoolAnnotatorAdapter, mvnDepsAnnotator}
+import katze.millij.annotator.lib.*
+import katze.millij.annotator.annotators.*
 import katze.millij.cool.{CoolPattern, PsiElementMatcher, PsiParentElementMatcher}
 import katze.millij.data.MillijBundle
 import katze.millij.place.*
@@ -12,11 +13,11 @@ import org.jetbrains.yaml.psi.*
 
 final class SmartMillYamlAnnotators extends SmartAnnotators(
   List(
-    CoolAnnotatorAdapter(
+    SmartCoolAnnotatorAdapter(
       unexistingMembersAnnotator(unexistingMembersError),
       CoolPattern.elementAndParents[YAMLKey[PsiElement], (YAMLKeyValue, YAMLMapping)]()
     ),
-    CoolAnnotatorAdapter(
+    SmartCoolAnnotatorAdapter(
       extendsBlockMembersAnnotator(
         (enclosingModule, scalar, annotationHolder, isOnCycle) =>
           if isOnCycle then
@@ -38,11 +39,11 @@ final class SmartMillYamlAnnotators extends SmartAnnotators(
           )
       ]()
     ),
-    CoolAnnotatorAdapter(
+    SmartCoolAnnotatorAdapter(
       mvnDepsAnnotator,
       CoolPattern.elementAndParent()
     ),
-    CoolAnnotatorAdapter(
+    SmartCoolAnnotatorAdapter(
       methodAndFieldAnnotator(element =>
         richPlaceOf(element).toOption.collect:
           case PlaceInYamlConfig.Member(_, expectedType, _) if !isMvnDependency(expectedType) =>

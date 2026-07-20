@@ -1,4 +1,4 @@
-package katze.millij.annotator
+package katze.millij.annotator.lib
 
 import com.intellij.lang.annotation.{AnnotationHolder, Annotator}
 import com.intellij.psi.PsiElement

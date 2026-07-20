@@ -1,4 +1,4 @@
-package katze.millij.annotator
+package katze.millij.annotator.annotators
 
 import com.intellij.lang.annotation.HighlightSeverity
 import katze.millij.data.*

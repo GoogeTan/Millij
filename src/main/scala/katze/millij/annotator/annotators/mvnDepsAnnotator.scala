@@ -1,13 +1,14 @@
-package katze.millij.annotator
+package katze.millij.annotator.annotators
 
 import cats.syntax.all.*
 import com.intellij.lang.annotation.{AnnotationHolder, HighlightSeverity}
 import com.intellij.psi.util.InheritanceUtil
 import com.intellij.structuralsearch.impl.matcher.handlers.AnnotationHandler
-import katze.millij.psi.yamlMavenDependenciesPattern
+import katze.millij.annotator.MillijTextStyles
+import katze.millij.annotator.lib.CoolAnnotator
 import katze.millij.data.Smart
 import katze.millij.place.{PlaceInYamlConfig, richPlaceOf}
-import katze.millij.psi.{PsiChild, YAMLExactlyValue}
+import katze.millij.psi.{PsiChild, YAMLExactlyValue, yamlMavenDependenciesPattern}
 import katze.millij.scalatypes.isMvnDependency
 import org.jetbrains.plugins.scala.lang.psi.types.{ScType, ScTypeExt}
 import org.jetbrains.yaml.psi.{YAMLPsiElement, YAMLScalar}

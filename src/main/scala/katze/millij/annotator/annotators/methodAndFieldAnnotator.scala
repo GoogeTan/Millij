@@ -1,10 +1,12 @@
-package katze.millij.annotator
+package katze.millij.annotator.annotators
 
 import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.lang.annotation.{AnnotationHolder, HighlightSeverity}
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import katze.millij.*
+import katze.millij.annotator.MillijTextStyles
+import katze.millij.annotator.lib.CoolAnnotator
 import katze.millij.data.{MillijBundle, ScalaIdentifier, Smart}
 import katze.millij.place.*
 import katze.millij.psi.*

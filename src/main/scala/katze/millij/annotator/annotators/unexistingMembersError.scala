@@ -1,4 +1,4 @@
-package katze.millij.annotator
+package katze.millij.annotator.annotators
 
 import cats.syntax.all.*
 import com.intellij.openapi.util.text.HtmlChunk
