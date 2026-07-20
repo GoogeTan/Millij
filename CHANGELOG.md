@@ -1,7 +1,11 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 
-# mill-project-templates Changelog
+# Millij Changelog
 
-## [Unreleased]
-### Added
-- Initial scaffold created from [IntelliJ Platform Plugin Template](https://github.com/JetBrains/intellij-platform-plugin-template)x
+## 0.0.1
+
+- Syntax highlighting
+- Code completions
+- Go to definition/Reference resolution
+- Inlay type hints
+- Project wizard for kotlin, java and scala 
