@@ -2,7 +2,7 @@
 
 # Millij Changelog
 
-## 0.0.1
+## [Unreleased]
 
 - Syntax highlighting
 - Code completions
