@@ -8,6 +8,7 @@ import com.intellij.openapi.project.{Project, ProjectUtil}
 import com.intellij.openapi.roots.ProjectRootManager
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.{VfsUtilCore, VirtualFile, VirtualFileVisitor}
+import com.intellij.psi.search.{FilenameIndex, GlobalSearchScope}
 
 import java.util
 import scala.jdk.CollectionConverters.*
@@ -27,13 +28,14 @@ final class MillBspProjectAware(project: Project) extends AbstractMillBspProject
   
   override def getSettingsFiles: java.util.Set[String] =
     ReadAction.computeBlocking: () =>
-      val files = new util.HashSet[String]()
-      val fileIndex = ProjectRootManager.getInstance(project).getFileIndex
+      val files = new java.util.HashSet[String]()
+      val scope = GlobalSearchScope.projectScope(project)
 
-      fileIndex.iterateContent: (file: VirtualFile) =>
-        if !file.isDirectory && millConfigNames.contains(file.getName) then
+      millConfigNames.foreach { configName =>
+        FilenameIndex.getVirtualFilesByName(configName, scope).forEach { file =>
           files.add(file.getPath)
-        true 
+        }
+      }
 
       files
   end getSettingsFiles
