@@ -44,13 +44,6 @@
                 providerId="katze.mill.yaml.inlay.provider"
         />
 
-        <toolWindow
-                factoryClass="katze.millij.toolwindow.MillModulesToolWindowFactory"
-                id="MillToolWindow"
-                anchor="right"
-                icon="icons/millFile.svg"
-        />
-
         <newProjectWizard.scala.buildSystem
             implementation="katze.millij.wizard.MillScalaNewProjectWizard" />
         <newProjectWizard.java.buildSystem
