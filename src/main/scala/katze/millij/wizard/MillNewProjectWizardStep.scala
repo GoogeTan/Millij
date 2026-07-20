@@ -71,11 +71,11 @@ final class MillNewProjectWizardStep(
     else
       "build.mill.yaml"
     generateMillBuildFile(projectDir, configFilename)
-
+    val millVersion = millVersionField.getText
     ProgressManager.getInstance().run(
       new Task.Backgroundable(project, "Setting up Mill project...", false):
         override def run(indicator: ProgressIndicator): Unit =
-          if downloadMill(projectDir, indicator) then
+          if downloadMill(projectDir, indicator, millVersion) then
             val virtualFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(projectDir)
             if virtualFile != null then
               MillRunner.installAndRefreshBsp(project, virtualFile)
@@ -94,8 +94,7 @@ final class MillNewProjectWizardStep(
     Files.writeString(dir.resolve(".mill-version"), millVersion)
   end generateMillBuildFile
 
-  def downloadMill(targetDir: Path, indicator: ProgressIndicator): Boolean =
-    val millVersion = millVersionField.getText
+  def downloadMill(targetDir: Path, indicator: ProgressIndicator, millVersion : String): Boolean =
     val baseUrl = s"https://repo1.maven.org/maven2/com/lihaoyi/mill-dist/$millVersion"
     
     val shRemote = s"mill-dist-$millVersion-mill.sh"
