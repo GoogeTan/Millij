@@ -1,9 +1,10 @@
 package katze.millij.externalSystem
 
 import cats.syntax.all.*
-import com.intellij.build.events.{StartBuildEvent, OutputBuildEvent, FinishBuildEvent, SuccessResult, FailureResult, Warning, Failure}
+import com.intellij.build.DefaultBuildDescriptor
+import com.intellij.build.events.{Failure, FailureResult, FinishBuildEvent, OutputBuildEvent, StartBuildEvent, SuccessResult, Warning}
 import com.intellij.execution.configurations.{GeneralCommandLine, PathEnvironmentVariableUtil}
-import com.intellij.execution.process.{OSProcessHandler, ProcessListener, ProcessOutputType}
+import com.intellij.execution.process.{OSProcessHandler, ProcessEvent, ProcessListener, ProcessOutputType}
 import com.intellij.notification.{NotificationGroupManager, NotificationType}
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
@@ -11,7 +12,10 @@ import com.intellij.openapi.externalSystem.model.ProjectSystemId
 import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
 import com.intellij.openapi.progress.{ProgressIndicator, ProgressManager, Task}
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.{VfsUtil, VirtualFile}
+
+import java.util
 import java.util.Collections
 
 object MillRunner:
@@ -53,40 +57,37 @@ object MillRunner:
       cmd.setWorkDirectory(baseDir.getPath)
       val handler = OSProcessHandler(cmd)
 
-      // 1. Initialize the Sync tool window integration
       val buildId = new Object()
       val syncViewManager = project.getService(classOf[com.intellij.build.SyncViewManager])
-      val buildDescriptor = com.intellij.build.DefaultBuildDescriptor(
+      val buildDescriptor = DefaultBuildDescriptor(
         buildId,
         "Mill BSP Setup",
         baseDir.getPath,
         System.currentTimeMillis()
       )
 
-      // Notify the IDE that a sync process has started
       val startEvent = StartBuildEvent.builder(buildId.toString, buildDescriptor).build()
       syncViewManager.onEvent(buildId, startEvent)
 
-      // 2. Intercept process output and pipe it to the Sync view
       handler.addProcessListener(new ProcessListener:
-        override def onTextAvailable(event: com.intellij.execution.process.ProcessEvent, outputType: com.intellij.openapi.util.Key[?]): Unit =
-          val processOutputType = outputType.asInstanceOf[ProcessOutputType]
-          // This streams the CLI text directly into the Build tool window console
-          val outputEvent = OutputBuildEvent.builder(event.getText)
-            .withParentId(buildId)
-            .withOutputType(processOutputType)
-            .build()
-          syncViewManager.onEvent(buildId, outputEvent)
+        override def onTextAvailable(event: ProcessEvent, outputType: Key[?]): Unit =
+          outputType match
+            case processOutputType : ProcessOutputType =>
+              val outputEvent = OutputBuildEvent.builder(event.getText)
+                .withParentId(buildId)
+                .withOutputType(processOutputType)
+                .build()
+              syncViewManager.onEvent(buildId, outputEvent)
+            case _ => ()
       )
 
       handler.startNotify()
       handler.waitFor()
 
-      // 3. Mark the sync process as finished (Success or Failure)
       if handler.getExitCode == 0 then
         val successResult = new SuccessResult:
           override def isUpToDate: Boolean = false
-          override def getWarnings: java.util.List[? <: Warning] = Collections.emptyList()
+          override def getWarnings: util.List[? <: Warning] = Collections.emptyList()
 
         val finishEvent = FinishBuildEvent.builder(
           buildId,
@@ -107,7 +108,7 @@ object MillRunner:
           onFinishedCallback.foreach(_(true))
       else
         val failureResult = new FailureResult:
-          override def getFailures: java.util.List[? <: Failure] = Collections.emptyList()
+          override def getFailures: util.List[? <: Failure] = Collections.emptyList()
 
         val finishEvent = FinishBuildEvent.builder(
           buildId,
@@ -116,11 +117,15 @@ object MillRunner:
         ).build()
         syncViewManager.onEvent(buildId, finishEvent)
         reportError(project, s"Mill BSP installation failed with exit code: ${handler.getExitCode}")
-        onFinishedCallback.foreach(_(false))
+        onFinishedCallback.foreach(callback =>
+          ApplicationManager.getApplication.invokeLater(() => callback(false))
+        )
     catch
       case e: Exception =>
         reportError(project, s"Exception occurred while running Mill: ${e.getMessage}")
-        onFinishedCallback.foreach(_(false))
+        onFinishedCallback.foreach(callback =>
+          ApplicationManager.getApplication.invokeLater(() => callback(false))
+        )
   end executeMill
 
   private def reportError(project: Project, message: String): Unit =
@@ -129,5 +134,4 @@ object MillRunner:
       .createNotification("BSP Import Failed", message, NotificationType.ERROR)
       .notify(project)
   end reportError
-
 end MillRunner
