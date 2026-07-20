@@ -5,8 +5,7 @@
 
     <description>
         The plugin adds support for the Mill build tool. It enables multiple features such as
-        type hints, go to definition, code completions for YAML configs, project wizards,
-        available tasks tool window, and others.
+        type hints, go to definition, code completions for YAML configs, project wizards and others.
     </description>
 
     <resource-bundle>messages.MillijBundle</resource-bundle>
