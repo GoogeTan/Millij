@@ -19,29 +19,19 @@ import scala.util.matching.Regex
  * Returns true if text is a correct text of key value that defines a module.
  */
 def isObjectDeclarationText(text : String) : Boolean =
-  val objectNameRegex: Regex = "[a-zA-Z_$][\\w$]*$".r
-
-  val objectRegex = s"object $objectNameRegex".r
-
-  objectRegex.matches(text)
+  extractObjectName(text).isDefined
 end isObjectDeclarationText
 
 /**
- * Extracts and returns the object name if the text is a correct object declaration.
- * Returns Some(name) if matched, or None otherwise.
+ * Extracts and returns the object name if the text is an object declaration.
  */
 def extractObjectName(text: String): Option[String] =
-  // 1. Define the pattern as a String first (interpolating a Regex object calls .toString anyway)
-  val objectNamePattern = "[a-zA-Z_$][\\w$]*"
-
-  // 2. Wrap the pattern in parentheses () to create a capture group.
-  // Note: We use $$ to represent the literal end-of-string $ character in an interpolated string.
-  val objectRegex: Regex = s"object ($objectNamePattern)$$".r
-
-  // 3. Use pattern matching to extract the captured group
-  text match
-    case objectRegex(name) => Some(name)
-    case _                 => None
+  val trimedText = text.trim
+  val objectText = "object"
+  if trimedText.startsWith(objectText) then
+    Some(trimedText.drop(objectText.length).trim)
+  else 
+    None  
 end extractObjectName
 
 /**

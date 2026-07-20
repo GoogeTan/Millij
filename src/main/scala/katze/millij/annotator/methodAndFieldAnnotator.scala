@@ -5,7 +5,7 @@ import com.intellij.lang.annotation.{AnnotationHolder, HighlightSeverity}
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import katze.millij.*
-import katze.millij.data.Smart
+import katze.millij.data.{MillijBundle, ScalaIdentifier, Smart}
 import katze.millij.place.*
 import katze.millij.psi.*
 import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping}
@@ -39,11 +39,12 @@ def methodAndFieldAnnotator(scopeOf : YAMLKeyValueWithNotKey["extends"] => Optio
   case ((kv, mapping), annotationHolder) =>
     scopeOf(kv) match
       case Some(true) =>
-        if isObjectDeclarationText(kv.getKeyText) then
-          annotateObjectKeyValue(kv, annotationHolder)
-        else
-          annotateModuleMemeber(kv, annotationHolder)
-        end if
+        extractObjectName(kv.getKeyText) match 
+          case Some(value) =>
+            annotateObjectKeyValue(kv, annotationHolder, value)
+          case None =>
+            annotateModuleMemeber(kv, annotationHolder)
+        end match
       case Some(false) =>
         annotationHolder
           .newSilentAnnotation(HighlightSeverity.INFORMATION)
@@ -53,7 +54,7 @@ def methodAndFieldAnnotator(scopeOf : YAMLKeyValueWithNotKey["extends"] => Optio
       case None =>
 end methodAndFieldAnnotator
 
-def annotateObjectKeyValue(keyValue: YAMLKeyValue, annotationHolder: AnnotationHolder) : Unit =
+def annotateObjectKeyValue(keyValue: YAMLKeyValue, annotationHolder: AnnotationHolder, objectName : String) : Unit =
   val (objectKeywordRange, nameRange) = objectTextRanges(keyValue.getKey.getTextRange)
 
   annotationHolder
@@ -61,12 +62,17 @@ def annotateObjectKeyValue(keyValue: YAMLKeyValue, annotationHolder: AnnotationH
     .textAttributes(MillijTextStyles.OBJECT_KEYWORD)
     .range(objectKeywordRange)
     .create()
-
-  annotationHolder
-    .newSilentAnnotation(HighlightSeverity.INFORMATION)
-    .textAttributes(MillijTextStyles.MILL_YAML_MODULE_NAME)
-    .range(nameRange)
-    .create()
+  if ScalaIdentifier.fromStringOption(objectName).isDefined then
+    annotationHolder
+      .newSilentAnnotation(HighlightSeverity.INFORMATION)
+      .textAttributes(MillijTextStyles.MILL_YAML_MODULE_NAME)
+      .range(nameRange)
+      .create()
+  else
+    annotationHolder
+      .newAnnotation(HighlightSeverity.ERROR, MillijBundle.message("annotator.incorrect.module.name"))
+      .range(nameRange)
+      .create()
 end annotateObjectKeyValue
 
 def annotateModuleMemeber(keyValue: YAMLKeyValue, annotationHolder: AnnotationHolder) : Unit =

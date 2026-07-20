@@ -8,7 +8,6 @@ import org.junit.Assert.*
 import scala.jdk.CollectionConverters.*
 
 //TODO add cases where build.A.Trait is overridden
-//TODO add tests where a parent is not found
 class MillYamlAnnotatorTest extends BasePlatformTestCase:
   override def getProjectDescriptor: LightProjectDescriptor = MillProjectDescriptor
 
@@ -164,4 +163,31 @@ class MillYamlAnnotatorTest extends BasePlatformTestCase:
     )
     myFixture.checkHighlighting(false, true, false)
   end testAbsentParent
+
+  def testBadModuleNames(): Unit =
+    myFixture.configureByText(
+      "build.mill.yaml",
+      """
+        |<info descr="null" textAttributesKey="MILL_YAML_OBJECT_KEYWORD">object</info><error descr="Not a correct name for a module" textAttributesKey="ERRORS_ATTRIBUTES"> a+</error>:
+        |<info descr="null" textAttributesKey="MILL_YAML_OBJECT_KEYWORD">object</info><error descr="Not a correct name for a module" textAttributesKey="ERRORS_ATTRIBUTES"> a t</error>:
+        |<info descr="null" textAttributesKey="MILL_YAML_OBJECT_KEYWORD">object</info><error descr="Not a correct name for a module" textAttributesKey="ERRORS_ATTRIBUTES"> a$</error>:
+        |
+        |
+        |""".stripMargin
+    )
+    myFixture.checkHighlighting(false, true, false)
+  end testBadModuleNames
+
+  def testBadModuleNamesDependencies(): Unit =
+    myFixture.configureByText(
+      "build.mill.yaml",
+      """
+        |<info descr="null" textAttributesKey="MILL_YAML_OBJECT_KEYWORD">object</info><error descr="Not a correct name for a module" textAttributesKey="ERRORS_ATTRIBUTES"> a+</error>:
+        | extends: SbtModule
+        |<info descr="null" textAttributesKey="MILL_YAML_OBJECT_KEYWORD">object</info><error descr="Not a correct name for a module" textAttributesKey="ERRORS_ATTRIBUTES"> a t</error>:
+        | extends: a+.SbtTests
+        |""".stripMargin
+    )
+    myFixture.checkHighlighting(false, true, false)
+  end testBadModuleNamesDependencies
 end MillYamlAnnotatorTest
