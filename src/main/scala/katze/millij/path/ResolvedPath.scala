@@ -1,8 +1,9 @@
-package katze.millij.data
+package katze.millij.path
 
 import cats.data.NonEmptyList
 import cats.syntax.all.*
 import cats.{Applicative, Eq, Foldable, SemigroupK, ~>}
+import katze.millij.data.ResolvedSymbol
 
 /**
  * Is used to represent an identifier whose parts are resolved.

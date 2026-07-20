@@ -1,7 +1,7 @@
-package katze.millij.data.module
+package katze.millij.module
 
 import com.intellij.util.io.{DataExternalizer, DataInputOutputUtil, IOUtil}
-import katze.millij.data.SegmentedPath
+import katze.millij.path.{NamespacedPath, SegmentedPath}
 
 import java.io.{DataInput, DataOutput, IOException}
 import scala.jdk.CollectionConverters.*

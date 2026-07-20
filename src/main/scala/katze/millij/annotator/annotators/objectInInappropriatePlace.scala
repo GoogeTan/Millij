@@ -1,8 +1,8 @@
 package katze.millij.annotator.annotators
 
 import com.intellij.lang.annotation.HighlightSeverity
+import katze.millij.MillijBundle
 import katze.millij.annotator.lib.CoolAnnotator
-import katze.millij.data.MillijBundle
 import katze.millij.place.isObjectDeclarationText
 import katze.millij.psi.PsiChild
 import org.jetbrains.yaml.psi.{YAMLDocument, YAMLKeyValue, YAMLMapping}

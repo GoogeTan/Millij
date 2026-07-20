@@ -1,10 +1,11 @@
-package katze.millij.data
+package katze.millij.module
 
 import cats.data.NonEmptyList
 import cats.syntax.all.*
 import cats.{Eq, Show}
 import com.intellij.psi.PsiPackage
-import katze.millij.data.module.{ModuleDeclaration, NamespacedPath}
+import katze.millij.data.{ResolvedSymbol, Smart}
+import katze.millij.path.*
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.project.ProjectContext
 import org.jetbrains.yaml.psi.YAMLMapping

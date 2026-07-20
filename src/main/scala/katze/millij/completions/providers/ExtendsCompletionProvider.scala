@@ -9,7 +9,6 @@ import katze.millij
 import katze.millij.completions.cool.CoolCompletionProvider
 import katze.millij.completions.insert
 import katze.millij.completions.insert.{ExtendsArrayInsertHandler, YamlKeyInsertHandler}
-import katze.millij.data.module.NamespacedPath
 import katze.millij.data.Smart
 import katze.millij.place.enclosingModule
 import katze.millij.psi.*
@@ -18,6 +17,7 @@ import org.jetbrains.yaml.psi.*
 
 import scala.jdk.CollectionConverters.*
 import cats.syntax.all.*
+import katze.millij.path.NamespacedPath
 
 class YamlPrefixMatcher(
   prefix: String,

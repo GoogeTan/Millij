@@ -1,4 +1,4 @@
-package katze.millij.data
+package katze.millij.service
 
 import cats.data.NonEmptyList
 import com.intellij.openapi.components.Service
@@ -8,6 +8,8 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.searches.ClassInheritorsSearch
 import com.intellij.psi.util.{CachedValueProvider, CachedValuesManager, PsiModificationTracker}
+import katze.millij.data.Smart
+import katze.millij.path.SegmentedPath
 import katze.millij.scalatypes.{millApiModuleName, millConfigModule}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScTrait}
 

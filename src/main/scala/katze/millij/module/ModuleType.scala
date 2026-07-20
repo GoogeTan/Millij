@@ -1,5 +1,7 @@
-package katze.millij.data
+package katze.millij.module
 
+import katze.millij.data.ResolvedSymbol
+import katze.millij.path.ResolvedPath
 import org.jetbrains.plugins.scala.lang.psi.types.{ScCompoundType, ScType}
 import org.jetbrains.plugins.scala.project.ProjectContext
 

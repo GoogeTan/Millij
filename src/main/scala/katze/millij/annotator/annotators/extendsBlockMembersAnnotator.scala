@@ -2,11 +2,12 @@ package katze.millij.annotator.annotators
 
 import com.intellij.lang.annotation.{AnnotationHolder, HighlightSeverity}
 import katze.millij.annotator.lib.CoolAnnotator
-import katze.millij.data.module.NamespacedPath
-import katze.millij.data.{MillModuleService, Smart}
+import katze.millij.data.Smart
 import katze.millij.file.*
+import katze.millij.path.NamespacedPath
 import katze.millij.place.*
 import katze.millij.psi.{YAMLKeyValueWithKey, YAMLMillModule}
+import katze.millij.service.MillModuleService
 import org.jetbrains.yaml.psi.impl.YAMLValueImpl
 import org.jetbrains.yaml.psi.*
 

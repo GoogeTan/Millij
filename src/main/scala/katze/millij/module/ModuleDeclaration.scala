@@ -1,7 +1,7 @@
-package katze.millij.data.module
+package katze.millij.module
 
 import cats.data.NonEmptyList
-import katze.millij.data.SegmentedPath
+import katze.millij.path.{NamespacedPath, SegmentedPath}
 
 final case class ModuleDeclaration[Segment](
   path : NamespacedPath[List, Segment],

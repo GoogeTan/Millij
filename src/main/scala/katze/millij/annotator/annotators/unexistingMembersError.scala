@@ -3,8 +3,8 @@ package katze.millij.annotator.annotators
 import cats.syntax.all.*
 import com.intellij.openapi.util.text.HtmlChunk
 import katze.millij
-import katze.millij.data.{MillijBundle, Smart}
-import katze.millij.place
+import katze.millij.data.Smart
+import katze.millij.{MillijBundle, place}
 import katze.millij.place.PlaceInYamlConfig.{Member, Module}
 import katze.millij.place.{PlaceInYamlConfig, richPlaceOf, yamlDefinableMembersOfScope}
 import katze.millij.scalatypes.{ScMapType, isMvnDependency}

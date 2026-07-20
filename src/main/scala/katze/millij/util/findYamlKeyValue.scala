@@ -1,6 +1,6 @@
 package katze.millij.util
 
-import katze.millij.data.SegmentedPath
+import katze.millij.path.SegmentedPath
 import katze.millij.place.extractObjectName
 import katze.millij.psi.PsiChild
 import org.jetbrains.yaml.psi.*

@@ -1,4 +1,4 @@
-package katze.millij.data.module
+package katze.millij.service
 
 import cats.data.NonEmptyList
 import com.intellij.lang.{LighterAST, LighterASTNode}
@@ -6,11 +6,12 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.tree.{IElementType, IFileElementType}
 import com.intellij.util.indexing.*
 import com.intellij.util.io.{DataExternalizer, KeyDescriptor}
-import katze.millij.data.SegmentedPath
+import katze.millij.module.{ModuleDeclaration, ModuleDeclarationExternalizer}
 import katze.millij.file.relativePathToContentRoot
+import katze.millij.path.{NamespacedPath, SegmentedPath, SegmentedPathKeyDescriptor}
 import katze.millij.place.{extractObjectName, getExtendsContentsOf}
-import org.jetbrains.yaml.{YAMLElementTypes, YAMLTokenTypes}
 import org.jetbrains.yaml.psi.*
+import org.jetbrains.yaml.{YAMLElementTypes, YAMLTokenTypes}
 
 import java.io.{DataInput, DataOutput}
 import java.util
@@ -25,7 +26,7 @@ final class YamlModuleIndex extends FileBasedIndexExtension[SegmentedPath[List, 
 
   override def getValueExternalizer: DataExternalizer[ModuleDeclaration[String]] = ModuleDeclarationExternalizer()
 
-  override def getVersion: Int = 27
+  override def getVersion: Int = 28
 
   override def dependsOnFileContent(): Boolean = true
 
@@ -66,14 +67,8 @@ final class YamlModuleIndex extends FileBasedIndexExtension[SegmentedPath[List, 
   end getIndexer
 
   def rootFileModulePath(inputData : FileContent) : Option[SegmentedPath[List, String]] =
-    inputData.relativePathToContentRoot.map(relativePath =>
-      if relativePath.contains('/') then//TODO is this folderPath?
-        val parentPath = relativePath.substring(0, relativePath.lastIndexOf('/'))
-        SegmentedPath.fromQualified(parentPath.replace('/', '.'))
-      else
-        SegmentedPath(Nil)
-      end if
-    )
+    inputData.relativePathToContentRoot
+      .map(SegmentedPath.folderPath)
   end rootFileModulePath
   
   def collectModules(

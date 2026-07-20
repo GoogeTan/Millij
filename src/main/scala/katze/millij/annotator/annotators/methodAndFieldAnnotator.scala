@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement
 import katze.millij.*
 import katze.millij.annotator.MillijTextStyles
 import katze.millij.annotator.lib.CoolAnnotator
-import katze.millij.data.{MillijBundle, ScalaIdentifier, Smart}
+import katze.millij.data.{ScalaIdentifier, Smart}
 import katze.millij.place.*
 import katze.millij.psi.*
 import org.jetbrains.yaml.psi.{YAMLKeyValue, YAMLMapping}

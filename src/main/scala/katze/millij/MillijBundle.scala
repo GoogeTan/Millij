@@ -1,4 +1,4 @@
-package katze.millij.data
+package katze.millij
 
 import com.intellij.DynamicBundle
 import org.jetbrains.annotations.{Nls, NonNls, NotNull, PropertyKey}

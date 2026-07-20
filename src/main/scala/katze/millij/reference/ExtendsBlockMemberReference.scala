@@ -5,7 +5,9 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
 import com.intellij.psi.search.GlobalSearchScope
 import katze.millij.data.*
-import katze.millij.data.module.*
+import katze.millij.module.*
+import katze.millij.path.*
+import katze.millij.service.MillModuleService
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.yaml.psi.YAMLScalar
 

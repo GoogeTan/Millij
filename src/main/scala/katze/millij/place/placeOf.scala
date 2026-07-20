@@ -5,10 +5,11 @@ import cats.syntax.all.*
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import katze.millij.data.*
-import katze.millij.data.module.NamespacedPath
 import katze.millij.file.*
+import katze.millij.path.*
 import katze.millij.place.PlaceConfigResolver.EitherString
 import katze.millij.psi.*
+import katze.millij.service.MillModuleService
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.project.ProjectContext
 import org.jetbrains.yaml.psi.*

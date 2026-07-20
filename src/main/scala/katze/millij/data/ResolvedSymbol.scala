@@ -1,7 +1,9 @@
 package katze.millij.data
 
 import cats.syntax.all.*
+import katze.millij.path.SegmentedPath
 import com.intellij.psi.{PsiClass, PsiElement, PsiPackage}
+import katze.millij.module.ModuleType
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTrait}
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.api.designator.{ScDesignatorType, ScProjectionType}

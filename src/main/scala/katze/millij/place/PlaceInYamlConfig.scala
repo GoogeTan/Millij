@@ -2,8 +2,8 @@ package katze.millij.place
 
 import cats.Applicative
 import cats.syntax.all.*
-import katze.millij.data.module.NamespacedPath
 import katze.millij.data.Smart
+import katze.millij.path.NamespacedPath
 import katze.millij.scalatypes.*
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition

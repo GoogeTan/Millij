@@ -82,7 +82,7 @@ object MillRunner:
       )
 
       handler.startNotify()
-      handler.waitFor()
+      handler.waitFor()//TODO add timeout
 
       if handler.getExitCode == 0 then
         val successResult = new SuccessResult:

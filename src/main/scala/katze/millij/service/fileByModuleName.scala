@@ -1,8 +1,11 @@
-package katze.millij.data.module
+package katze.millij.service
 
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.indexing.FileBasedIndex
-import katze.millij.data.{SegmentedPath, Smart}
+import katze.millij.data.Smart
+import katze.millij.module.ModuleDeclaration
+import katze.millij.path.SegmentedPath
+import katze.millij.service.YamlModuleIndex
 import org.jetbrains.yaml.psi.YAMLFile
 
 import scala.collection.mutable.ListBuffer

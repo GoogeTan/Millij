@@ -1,7 +1,8 @@
-package katze.millij.data
+package katze.millij.module
 
 import cats.data.NonEmptyList
-import katze.millij.data.module.{ModuleDeclaration, NamespacedPath}
+import katze.millij.data.{ResolvedSymbol, Smart}
+import katze.millij.path.*
 
 trait ModuleTypeResolver[Segment]:
   def typeModule(module: ModuleDeclaration[Segment])(using Smart) : ModuleType[Segment]

@@ -2,10 +2,10 @@ package katze.millij.annotator
 
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.psi.PsiElement
+import katze.millij.MillijBundle
 import katze.millij.annotator.lib.*
 import katze.millij.annotator.annotators.*
 import katze.millij.cool.{CoolPattern, PsiElementMatcher, PsiParentElementMatcher}
-import katze.millij.data.MillijBundle
 import katze.millij.place.*
 import katze.millij.psi.*
 import katze.millij.scalatypes.isMvnDependency

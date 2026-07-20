@@ -1,8 +1,9 @@
-package katze.millij.data
+package katze.millij.module
 
 import cats.*
 import cats.data.NonEmptyList
 import cats.syntax.all.*
+import katze.millij.path.SegmentedPath
 
 final case class DependencyCycle[Segment](cycle : NonEmptyList[SegmentedPath[List, Segment]]):
   def isOnCycle(module : SegmentedPath[List, Segment])(using Eq[Segment]) : Boolean =

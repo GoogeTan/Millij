@@ -3,8 +3,8 @@ package katze.millij.place
 import cats.*
 import cats.syntax.all.*
 import katze.millij.scalatypes.{isMvnDependency, ScMapType}
-import katze.millij.data.module.NamespacedPath
-import katze.millij.data.{SegmentedPath, Smart}
+import katze.millij.data.Smart
+import katze.millij.path.*
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.project.ProjectContext
 import org.jetbrains.yaml.psi.{YAMLMapping, YAMLPsiElement}

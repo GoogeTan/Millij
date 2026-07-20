@@ -1,7 +1,7 @@
 package katze.millij.file
 
 import com.intellij.psi.PsiElement
-import katze.millij.data.SegmentedPath
+import katze.millij.path.SegmentedPath
 
 /**
  * Relative location of a file to which element belongs.

@@ -5,8 +5,8 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import com.intellij.util.indexing.FileBasedIndex
 import katze.millij.Scala3ProjectDescriptor
-import katze.millij.data.module.YamlModuleIndex
-import katze.millij.data.SegmentedPath
+import katze.millij.service.YamlModuleIndex
+import katze.millij.path.SegmentedPath
 import org.junit.Assert.*
 
 import scala.jdk.CollectionConverters.*

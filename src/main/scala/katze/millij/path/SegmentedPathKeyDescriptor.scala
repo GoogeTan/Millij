@@ -1,8 +1,7 @@
-package katze.millij.data.module
+package katze.millij.path
 
 import cats.syntax.all.*
 import com.intellij.util.io.KeyDescriptor
-import katze.millij.data.SegmentedPath
 
 import java.io.{DataInput, DataOutput, IOException}
 

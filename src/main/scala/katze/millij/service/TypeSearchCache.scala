@@ -1,4 +1,4 @@
-package katze.millij.data
+package katze.millij.service
 
 import cats.Foldable
 import cats.data.NonEmptyList
@@ -8,6 +8,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.{CachedValueProvider, CachedValuesManager, PsiModificationTracker}
 import com.intellij.psi.{JavaPsiFacade, PsiClass, PsiPackage}
+import katze.millij.data.Smart
+import katze.millij.path.SegmentedPath
 import katze.millij.scalatypes.makePossibleImports
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager

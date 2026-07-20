@@ -4,7 +4,7 @@ import cats.{Foldable, Show}
 import com.intellij.openapi.project.{Project, ProjectUtil}
 import com.intellij.openapi.vfs.VirtualFile
 import cats.syntax.all.*
-import katze.millij.data.SegmentedPath
+import katze.millij.path.SegmentedPath
 
 def virtualFileByRelativePath(project: Project, relativePath: String) : Option[VirtualFile] =
   for

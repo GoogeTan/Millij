@@ -5,8 +5,8 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.{PsiElement, PsiFile}
 import katze.millij.data.*
-import katze.millij.data.module.NamespacedPath
 import katze.millij.file.*
+import katze.millij.path.*
 import katze.millij.place.*
 import katze.millij.psi.{YAMLChild, YAMLGrandChild, YAMLKey, YAMLKeyValueWithNotKey}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager

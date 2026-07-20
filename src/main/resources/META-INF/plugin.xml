@@ -52,7 +52,7 @@
         <codeInsight.linkHandler prefix="#goto/"
                                  handlerClass="katze.millij.reference.ScTypeNavigationHandler"/>
 
-        <fileBasedIndex implementation="katze.millij.data.module.YamlModuleIndex"/>
+        <fileBasedIndex implementation="katze.millij.service.YamlModuleIndex"/>
         <editorNotificationProvider
                 implementation="katze.millij.BspImportNotificationProvider"/>
         <notificationGroup id="Mill BSP Notifications" displayType="BALLOON" />

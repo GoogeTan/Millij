@@ -1,4 +1,4 @@
-package katze.millij.data
+package katze.millij.service
 
 import cats.data.NonEmptyList
 import com.intellij.openapi.components.Service
@@ -7,11 +7,13 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.{CachedValueProvider, CachedValuesManager, PsiModificationTracker}
 import com.intellij.util.indexing.FileBasedIndex
-import katze.millij.data.module.{ModuleDeclaration, NamespacedPath, YamlModuleIndex, findYamlModuleMapping}
+import katze.millij.data.*
+import katze.millij.file.*
+import katze.millij.module.*
+import katze.millij.path.*
 import katze.millij.scalatypes.{resolvePackageMember, resolveTypeMember}
 import org.jetbrains.plugins.scala.caches.RecursionManager
 import org.jetbrains.plugins.scala.project.ProjectContext
-import katze.millij.file.*
 
 import java.util.concurrent.ConcurrentHashMap
 import scala.jdk.CollectionConverters.*

@@ -1,11 +1,11 @@
-package katze.millij.data.module
+package katze.millij.service
 
 import cats.Foldable
 import cats.data.NonEmptyList
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.util.indexing.FileBasedIndex
 import katze.millij.data.*
-import katze.millij.data.module.ModuleDeclaration
+import katze.millij.module.ModuleDeclaration
 import katze.millij.util.findYamlKeyValue
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTrait, ScTypeDefinition}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers

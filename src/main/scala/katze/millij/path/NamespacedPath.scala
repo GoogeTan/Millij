@@ -1,9 +1,9 @@
-package katze.millij.data.module
+package katze.millij.path
 
 import cats.data.NonEmptyList
 import cats.syntax.all.*
 import cats.{Applicative, Foldable, Semigroup, Show, Traverse}
-import katze.millij.data.{SegmentedPath, foldableToListK}
+import katze.millij.data.foldableToListK
 
 final case class NamespacedPath[F[_], Segment](namespace : SegmentedPath[F, Segment], path : SegmentedPath[F, Segment]):
   def fullPath(using Semigroup[F[Segment]]) : SegmentedPath[F, Segment] = 

@@ -1,4 +1,4 @@
-package katze.millij.data
+package katze.millij.service
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.*

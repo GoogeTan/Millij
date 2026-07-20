@@ -3,8 +3,7 @@ package katze.millij.place
 import cats.Applicative
 import cats.syntax.all.*
 import katze.millij.file.elementsFilePath
-import katze.millij.data.module.NamespacedPath
-import katze.millij.data.SegmentedPath
+import katze.millij.path.*
 import org.jetbrains.yaml.psi.{YAMLMapping, YAMLPsiElement}
 
 final class EnclosingModulePathResolver[F[_] : Applicative](

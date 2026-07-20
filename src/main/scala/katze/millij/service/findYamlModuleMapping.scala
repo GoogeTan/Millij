@@ -1,7 +1,8 @@
-package katze.millij.data.module
+package katze.millij.service
 
 import com.intellij.psi.search.GlobalSearchScope
-import katze.millij.data.{SegmentedPath, Smart}
+import katze.millij.data.Smart
+import katze.millij.path.SegmentedPath
 import katze.millij.util.findYamlKeyValue
 import org.jetbrains.yaml.psi.YAMLMapping
 

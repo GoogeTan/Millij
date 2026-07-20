@@ -1,9 +1,8 @@
-package katze.millij.data
+package katze.millij.path
 
 import cats.*
 import cats.data.NonEmptyList
 import cats.syntax.all.*
-import katze.millij.data.ResolvedPath
 
 import scala.annotation.targetName
 

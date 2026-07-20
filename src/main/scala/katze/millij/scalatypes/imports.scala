@@ -5,7 +5,8 @@ import cats.arrow.FunctionK
 import cats.data.*
 import cats.syntax.all.*
 import com.intellij.psi.PsiClass
-import katze.millij.data.{SegmentedPath, nonEmptyListToSemigroupK}
+import katze.millij.data.nonEmptyListToSemigroupK
+import katze.millij.path.SegmentedPath
 
 /**
  * Those imports are added by mill on top of every YAML config implicitly.

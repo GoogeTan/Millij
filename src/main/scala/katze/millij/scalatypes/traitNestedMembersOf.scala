@@ -1,7 +1,8 @@
 package katze.millij.scalatypes
 
 import cats.data.NonEmptyList
-import katze.millij.data.{SegmentedPath, Smart}
+import katze.millij.data.Smart
+import katze.millij.path.SegmentedPath
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTrait}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers
 import org.jetbrains.plugins.scala.lang.psi.types.api.designator.ScProjectionType
