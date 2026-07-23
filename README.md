@@ -1,4 +1,5 @@
 # Millij
+![Build](https://github.com/GoogeTan/Millij/workflows/Build/badge.svg)
 
 This project adds IDE features specific to [mill build tool](https://github.com/com-lihaoyi/mill) including but not limited to YAML configs.
 
@@ -7,23 +8,12 @@ Feature list:
 - Highlighting, autocompletion, reference resolution and type hints for .mill.yaml configs
 - Mill tasks as run/debug configurations
 
-![Build](https://github.com/GoogeTan/Millij/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID)
-
 ## Installation
 
 - Using the IDE built-in plugin system:
-
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>Search for "millij"</kbd> >
-  <kbd>Install</kbd>
-
-- Using JetBrains Marketplace:
-
-  Go to [JetBrains Marketplace](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID) and install it by clicking the <kbd>Install to ...</kbd> button in case your IDE is running.
-
-  You can also download the [latest release](https://plugins.jetbrains.com/plugin/MARKETPLACE_ID/versions) from JetBrains Marketplace and install it manually using
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
+  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Manage plugin repositories</kbd> > <kbd>+</kbd> > <kbd>Add [https://googetan.github.io/Millij/updatePlugins.xml](https://googetan.github.io/Millij/updatePlugins.xml)</kbd>
+  
+  Then return to plugin section and search for "millij", click install
 
 - Manually:
 
