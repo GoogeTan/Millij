@@ -99,7 +99,7 @@ tasks {
 
         inputs.file(patchPluginXmlFile)
 
-        val outputFile = layout.projectDirectory.file("github-pages-intellij-repo/updatePlugins.xml")
+        val outputFile = layout.projectDirectory.file("docs/updatePlugins.xml")
         outputs.file(outputFile)
 
         val projectVersion = project.version.toString()
@@ -129,7 +129,7 @@ tasks {
             val sinceBuild = ideaVersionNode?.getAttribute("since-build") ?: ""
             val untilBuild = ideaVersionNode?.getAttribute("until-build") ?: ""
 
-            val downloadUrl = "$repoUrlVal/releases/download/$version/millij-$version.zip"
+            val downloadUrl = "$repoUrlVal/releases/download/$version/millij-$version-signed.zip"
 
             val output = outputFile.asFile
             output.parentFile.mkdirs()

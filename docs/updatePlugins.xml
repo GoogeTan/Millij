@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugins>
-    <plugin id="katze.millij" url="https://github.com/GoogeTan/Millij/releases/download/0.0.1/millij-0.0.1.zip" version="0.0.1">
+    <plugin id="katze.millij" url="https://github.com/GoogeTan/Millij/releases/download/0.0.1/millij-0.0.1-signed.zip" version="0.0.1">
         <name>Millij</name>
         <description><![CDATA[The plugin adds support for the Mill build tool. It enables multiple features such as
         type hints, go to definition, code completions for YAML configs, project wizards and others.]]></description>
