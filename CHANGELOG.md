@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+### Fixed
+- MillProjectStartupActivity now checks for project being mill one.
+
+## 0.0.1
+
 - Syntax highlighting
 - Code completions
 - Go to definition/Reference resolution
