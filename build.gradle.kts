@@ -89,6 +89,79 @@ tasks {
     publishPlugin {
         dependsOn(patchChangelog)
     }
+
+    register("generateUpdatePluginsXml") {
+        group = "publishing"
+        description = "Generates updatePlugins.xml from plugin.xml"
+
+        val patchPluginXmlTask = named<org.jetbrains.intellij.platform.gradle.tasks.PatchPluginXmlTask>("patchPluginXml")
+        val patchPluginXmlFile = patchPluginXmlTask.flatMap { it.outputFile }
+
+        inputs.file(patchPluginXmlFile)
+
+        val outputFile = layout.projectDirectory.file("github-pages-intellij-repo/updatePlugins.xml")
+        outputs.file(outputFile)
+
+        val projectVersion = project.version.toString()
+        val repoUrlVal = providers.gradleProperty("pluginRepositoryUrl").getOrElse("https://github.com/GoogeTan/Millij")
+
+        doLast {
+            val xmlFile = patchPluginXmlFile.get().asFile
+            if (!xmlFile.exists()) {
+                throw GradleException("patched plugin.xml not found at ${xmlFile.absolutePath}")
+            }
+
+            // Parse plugin.xml
+            val dbf = javax.xml.parsers.DocumentBuilderFactory.newInstance()
+            val db = dbf.newDocumentBuilder()
+            val doc = db.parse(xmlFile)
+            doc.documentElement.normalize()
+
+            val id = doc.getElementsByTagName("id").item(0)?.textContent?.trim() ?: ""
+            val name = doc.getElementsByTagName("name").item(0)?.textContent?.trim() ?: ""
+            val version = doc.getElementsByTagName("version").item(0)?.textContent?.trim() ?: projectVersion
+            val description = doc.getElementsByTagName("description").item(0)?.textContent?.trim() ?: ""
+
+            val changeNotesNode = doc.getElementsByTagName("change-notes").item(0)
+            val changeNotes = changeNotesNode?.textContent?.trim() ?: ""
+
+            val ideaVersionNode = doc.getElementsByTagName("idea-version").item(0) as? org.w3c.dom.Element
+            val sinceBuild = ideaVersionNode?.getAttribute("since-build") ?: ""
+            val untilBuild = ideaVersionNode?.getAttribute("until-build") ?: ""
+
+            val downloadUrl = "$repoUrlVal/releases/download/$version/millij-$version.zip"
+
+            val output = outputFile.asFile
+            output.parentFile.mkdirs()
+
+            val xmlBuilder = StringBuilder()
+            xmlBuilder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+            xmlBuilder.append("<plugins>\n")
+            xmlBuilder.append("    <plugin id=\"$id\" url=\"$downloadUrl\" version=\"$version\">\n")
+            xmlBuilder.append("        <name>$name</name>\n")
+            if (description.isNotEmpty()) {
+                xmlBuilder.append("        <description><![CDATA[$description]]></description>\n")
+            }
+            if (changeNotes.isNotEmpty()) {
+                xmlBuilder.append("        <change-notes><![CDATA[$changeNotes]]></change-notes>\n")
+            }
+            if (sinceBuild.isNotEmpty() || untilBuild.isNotEmpty()) {
+                xmlBuilder.append("        <idea-version")
+                if (sinceBuild.isNotEmpty()) {
+                    xmlBuilder.append(" since-build=\"$sinceBuild\"")
+                }
+                if (untilBuild.isNotEmpty()) {
+                    xmlBuilder.append(" until-build=\"$untilBuild\"")
+                }
+                xmlBuilder.append(" />\n")
+            }
+            xmlBuilder.append("    </plugin>\n")
+            xmlBuilder.append("</plugins>\n")
+
+            output.writeText(xmlBuilder.toString())
+            logger.lifecycle("Generated updatePlugins.xml at ${output.absolutePath}")
+        }
+    }
 }
 
 tasks.withType(Jar::class.java) {
